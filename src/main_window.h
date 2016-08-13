@@ -2,7 +2,7 @@
 
 #define DEBUG_MODE 1
 #define DEBUG_DUMMY_MIC 1
-#define DEBUG_DUMMY_PHONE 0
+#define DEBUG_DUMMY_PHONE 1
 
 typedef enum{
     MSG_PEBBLE_REQUEST_NOTE_COUNT = 0,
@@ -31,6 +31,20 @@ typedef enum{
 void send_note_request(NoteAppMessageKey msg, int32_t value);
 
 void send_note_edit(NoteAppMessageKey msg, int32_t id, char* edit);
+
+void request_new_note();
+
+void request_notes();
+
+void response_set_note_count(int32_t count);
+
+void response_set_current_note_id(int32_t id);
+
+void response_set_current_note_title(char* title);
+
+void response_set_note_body(char* body);
+
+void response_set_note_timestamp(int32_t timestamp);
 
 //WINDOW FUNCS
 void main_window_create();

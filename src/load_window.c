@@ -25,7 +25,6 @@ void load_window_click_provider(void *context){
 void load_window_load(Window *window){
     printf("load window loaded");
     Layer *window_layer = window_get_root_layer(window);
-
     //Load load image into GBitmap. All resources start with RESOURCE_ID_ before the actual resource ID name
     //loadImage = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_LOAD);
 

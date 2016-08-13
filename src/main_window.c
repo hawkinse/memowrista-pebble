@@ -31,6 +31,7 @@ void delete_note_headers(){
     noteCount = 0;
 }
 
+#if DEBUG_MODE
 void generate_dummy_note_headers(uint32_t count){
     delete_note_headers();
     //Allocate memory for headers
@@ -47,8 +48,10 @@ void generate_dummy_note_headers(uint32_t count){
         menu_layer_reload_data(mainMenuLayer);
     }
 }
+#endif
 
 void send_note_request(NoteAppMessageKey msg, int32_t value){
+    #if !DEBUG_DUMMY_PHONE
     DictionaryIterator *outDict;
     AppMessageResult outResult = app_message_outbox_begin(&outDict);
     switch(outResult){
@@ -70,6 +73,28 @@ void send_note_request(NoteAppMessageKey msg, int32_t value){
             APP_LOG(APP_LOG_LEVEL_ERROR, "Error preparing the outbox before pebble request %d, result %d",(int)msg, (int)outResult);
             error_window_show("Unable to send data to phone!");
     }
+    #else
+    switch(msg){
+        case MSG_PEBBLE_REQUEST_NOTE_COUNT:
+            printf("Dummy phone mode - setting note count to 1");
+            response_set_note_count(1);
+            break;
+        case MSG_PEBBLE_REQUEST_NOTE_ID:
+            printf("Dummy phone mode - setting note id to 1");
+            response_set_current_note_id(1);
+            break;
+        case MSG_PEBBLE_REQUEST_NOTE_TITLE:
+            printf("Dummy phone mode - setting note default title");
+            response_set_current_note_title("Dummy phone default title!");
+            break;
+        case MSG_PEBBLE_REQUEST_NOTE_BODY:
+            printf("Dummy phone mode - setting note default body");
+            response_set_note_body("Dummy phone default body!");
+            break;
+        default:
+            printf("Dummy phone mode - note request %d unimplemented!", msg);
+    }
+    #endif
 }
 
 void send_note_edit(NoteAppMessageKey msg, int32_t id, char* edit){
@@ -137,6 +162,8 @@ void response_set_current_note_title(char* title){
     strncpy(noteHeaders[recievedNoteCount].title, title, sizeof(noteHeaders[recievedNoteCount].title));
     APP_LOG(APP_LOG_LEVEL_INFO, "Set title of index %d", (int)recievedNoteCount);
     
+    printf("Response set current note title");
+
     recievedNoteCount++;
     if(recievedNoteCount < noteCount){
         send_note_request(MSG_PEBBLE_REQUEST_NOTE_ID, recievedNoteCount);
@@ -155,8 +182,11 @@ void response_set_current_note_title(char* title){
                 send_note_request(MSG_PEBBLE_REQUEST_NOTE_BODY, noteHeaders[0].id);
                 bAutoEnterFirst = false;
             } else {
+                printf("Removing window from stack");
                 window_stack_remove(load_window_get_window(), true);
             }
+        } else {
+            APP_LOG(APP_LOG_LEVEL_ERROR, "No main menu layer!");
         }
     }
 }
@@ -350,11 +380,13 @@ void main_window_load(Window *window){
     //256 is size of inbox and outbox.
     app_message_open(2048, 2048);
    
-
+    //Old position... race condition! Will fail if the phone responds before the main menu layer is created!
+    /*
     //Request notes from phone
     if(recievedNoteCount != noteCount || noteCount == 0){
         request_notes();
     }
+    */
 
     if(!mainTimeStatusBar){
         mainTimeStatusBar = status_bar_layer_create();
@@ -384,8 +416,14 @@ void main_window_load(Window *window){
     });
     }
 
+    printf("Main menu layer: %p", mainMenuLayer);
+
     menu_layer_set_click_config_onto_window(mainMenuLayer, window);
     layer_add_child(window_layer, menu_layer_get_layer(mainMenuLayer));
+
+    if(recievedNoteCount != noteCount || noteCount == 0){
+        request_notes();
+    }
 }
 
 //Called when removed from window stack.
