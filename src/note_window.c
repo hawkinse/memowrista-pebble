@@ -84,7 +84,7 @@ void note_dictation_replace_body_callback(DictationSession* session, DictationSe
     dictation_session_destroy(session);
 }
 
-void note_dictation_append_title_callback(DictationSession* session, DictationSessionStatus status, char* transcription, void* ctx){
+void note_dictation_append_body_callback(DictationSession* session, DictationSessionStatus status, char* transcription, void* ctx){
     switch(status){
         case DictationSessionStatusSuccess:
             load_window_show();
@@ -157,7 +157,7 @@ void note_action_append_body_callback(ActionMenu* menu, const ActionMenuItem* ac
     
     #if PBL_MICROPHONE
     APP_LOG(APP_LOG_LEVEL_INFO, "Microphone native!");
-    DictationSession *session = dictation_session_create(sizeof(noteBodyText), note_dictation_replace_body_callback, NULL);
+    DictationSession *session = dictation_session_create(sizeof(noteBodyText), note_dictation_append_body_callback, NULL);
     if(session == NULL){
         APP_LOG(APP_LOG_LEVEL_ERROR, "Dictation session null!");
         error_window_show("Dictation Null!");
@@ -166,7 +166,7 @@ void note_action_append_body_callback(ActionMenu* menu, const ActionMenuItem* ac
     dictation_session_start(session);
     #elif DEBUG_DUMMY_MIC
     APP_LOG(APP_LOG_LEVEL_INFO, "Debug dummy mic - directly calling callback!");
-    note_dictation_append_title_callback(NULL, DictationSessionStatusSuccess, "Dummy voice body appendage!", NULL);    
+    note_dictation_append_body_callback(NULL, DictationSessionStatusSuccess, "Dummy voice body appendage!", NULL);    
     #else
     error_window_show("Microphone needed!");
     #endif

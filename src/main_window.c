@@ -146,8 +146,8 @@ void send_note_edit(NoteAppMessageKey msg, int32_t id, char* edit){
             break;
         case MSG_PEBBLE_APPEND_BODY:
             printf("Dummy phone mode - append body of dummy note");
+            strcat(dummyNoteBody, "\n");
             strcat(dummyNoteBody, edit);
-            //strncpy(dummyNoteBody + strlen(edit), edit, sizeof(dummyNoteBody - strlen(edit)));
             break;
         default:
             printf("Dummy phone mode - note edit %d unimplemented!", msg);
