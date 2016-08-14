@@ -22,7 +22,7 @@ ActionMenu* noteActionMenu;
 
 //TODO - figure out good sizes for these arrays
 NoteHeader* noteCurrentHeader;
-char noteBodyText[2048];
+char noteBodyText[NOTE_BODY_SIZE];
 int32_t noteModifyTimestamp;
 
 //NOTE FUNCS

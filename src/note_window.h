@@ -1,5 +1,7 @@
 #pragma once
 
+#define NOTE_BODY_SIZE 2048
+
 typedef struct{
     char title[256];
     uint32_t id;

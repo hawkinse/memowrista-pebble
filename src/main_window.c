@@ -15,6 +15,10 @@ uint32_t noteCount = 0;
 uint32_t recievedNoteCount = 0;
 bool bAutoEnterFirst = false;
 
+#if DEBUG_DUMMY_PHONE
+char dummyNoteBody[NOTE_BODY_SIZE] = "Dummy phone default body!";
+#endif
+
 //NOTE FUNCS
 void delete_note_headers(){
     if(noteHeaders){
@@ -89,7 +93,15 @@ void send_note_request(NoteAppMessageKey msg, int32_t value){
             break;
         case MSG_PEBBLE_REQUEST_NOTE_BODY:
             printf("Dummy phone mode - setting note default body");
-            response_set_note_body("Dummy phone default body!");
+            response_set_note_body(dummyNoteBody);
+            break;
+        case MSG_PEBBLE_REQUEST_NOTE_TIME:
+            printf("Dummy phone mode - setting note timestamp to 0");
+            response_set_note_timestamp(0);
+            break;
+        case MSG_PEBBLE_DELETE_NOTE:
+            printf("Dummy phone mode - delete note. Ignoring request!");
+            error_window_show("Dummy phone note delete");
             break;
         default:
             printf("Dummy phone mode - note request %d unimplemented!", msg);
@@ -98,6 +110,7 @@ void send_note_request(NoteAppMessageKey msg, int32_t value){
 }
 
 void send_note_edit(NoteAppMessageKey msg, int32_t id, char* edit){
+    #if !DEBUG_DUMMY_PHONE
     DictionaryIterator *outDict;
     AppMessageResult outResult = app_message_outbox_begin(&outDict);
     switch(outResult){
@@ -121,6 +134,29 @@ void send_note_edit(NoteAppMessageKey msg, int32_t id, char* edit){
             APP_LOG(APP_LOG_LEVEL_ERROR, "Error preparing the outbox before pebble request %d, result %d",(int)msg, (int)outResult);
             error_window_show("Unable to send data to phone!");
     }
+    #else
+    switch(msg){
+        case MSG_PEBBLE_REPLACE_TITLE:
+            printf("Dummy phone mode - replacing title of dummy note");
+            strncpy(noteHeaders[0].title, edit, sizeof(noteHeaders[0].title));
+            break;
+        case MSG_PEBBLE_REPLACE_BODY:
+            printf("Dummy phone mode - replacing body of dummy note");
+            strncpy(dummyNoteBody, edit, sizeof(dummyNoteBody));
+            break;
+        case MSG_PEBBLE_APPEND_BODY:
+            printf("Dummy phone mode - append body of dummy note");
+            strcat(dummyNoteBody, edit);
+            //strncpy(dummyNoteBody + strlen(edit), edit, sizeof(dummyNoteBody - strlen(edit)));
+            break;
+        default:
+            printf("Dummy phone mode - note edit %d unimplemented!", msg);
+    }
+
+    //Instead of re-requesting notes, just enter first note as otherwise we'll overwrite changes!
+    note_set_body(&noteHeaders[0], dummyNoteBody);
+    window_stack_push(note_window_get_window(), true);
+    #endif
 }
 
 void request_new_note(){

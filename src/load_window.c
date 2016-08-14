@@ -9,9 +9,13 @@ TextLayer* loadTextLayer;
 char* loadText = "Loading...";
 
 void load_window_show(){
+    #if !DEBUG_DUMMY_PHONE //Some dummy phone code can cause the loading screen to stick, and is so fast that it's not needed.'
     if(!window_stack_contains_window(loadWindow)){
         window_stack_push(loadWindow, true);
     }
+    #else
+    printf("Debug dummy phone - loading window requested to show but ignored");
+    #endif
 }
 void load_button_back_callback(ClickRecognizerRef recognizer, void* context){
     //Simply exist so the user can't back out of the loading screen
