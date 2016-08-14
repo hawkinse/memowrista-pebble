@@ -61,6 +61,9 @@ void note_dictation_replace_title_callback(DictationSession* session, DictationS
         default:
             error_window_show("Microphone Error!");
     }
+
+    //Needed to prevent future dictation sessions from calling this callback
+    dictation_session_destroy(session);
 }
 
 void note_dictation_replace_body_callback(DictationSession* session, DictationSessionStatus status, char* transcription, void* ctx){
@@ -76,6 +79,9 @@ void note_dictation_replace_body_callback(DictationSession* session, DictationSe
         default:
             error_window_show("Microphone Error!");
     }
+
+    //Needed to prevent future dictation sessions from calling this callback
+    dictation_session_destroy(session);
 }
 
 void note_dictation_append_title_callback(DictationSession* session, DictationSessionStatus status, char* transcription, void* ctx){
@@ -91,6 +97,9 @@ void note_dictation_append_title_callback(DictationSession* session, DictationSe
         default:
             error_window_show("Microphone Error!");
     }
+
+    //Needed to prevent future dictation sessions from calling this callback
+    dictation_session_destroy(session);
 }
 //ACTION BAR FUNCS
 
