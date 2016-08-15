@@ -290,15 +290,19 @@ void message_inbox_dropped(AppMessageResult reason, void *context){
 uint16_t menu_get_num_sections_callback(MenuLayer *menu_layer, void *data) {
     //First section is the notes themselves
     //Second section is actions.
-    return 2;
+    //Third is about and enabled debug flags
+    return 3;
 }
 
 uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
     switch(section_index){
-        case 0:
+        case MENU_SECTION_NOTES:
             return noteCount;
-        case 1:
+        case MENU_SECTION_ACTIONS:
             return 2;
+        case MENU_SECTION_ABOUT:
+            //Return 1 row if not in debug mode for about. Return 4 if in debug mode so we can show debug mode options
+            return (DEBUG_MODE ? 4 : 1);
         default:
             return 0;
     }
@@ -310,25 +314,46 @@ int16_t menu_get_header_height_callback(MenuLayer *menu_layer, uint16_t section_
 }
 
 void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t section_index, void *data) {
+    GRect layerBounds = layer_get_bounds(cell_layer);
+    layerBounds.origin.y -= 5;
+
+    #if PBL_COLOR
     graphics_context_set_fill_color(ctx, COLOR_PRIMARY);
     graphics_context_set_text_color(ctx, COLOR_TEXT_LIGHT);
+    #endif
 
     graphics_fill_rect(ctx, layer_get_bounds(cell_layer), 0, GCornerNone);
 
-    GRect layerBounds = layer_get_bounds(cell_layer);
-    layerBounds.origin.y -= 5;
     switch(section_index){
-        case 0:            
+        case MENU_SECTION_NOTES:            
             //Draw text with graphics context instead of using a text layer. Final null paremter is for GTextAttributes
-            graphics_draw_text(ctx, TEXT_MENU_HEADER_NOTES, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), layerBounds, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
+            graphics_draw_text(ctx, (noteCount > 0 ? TEXT_MENU_HEADER_NOTES : TEXT_MENU_HEADER_NOTES_NONE), fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), layerBounds, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
             //Basic function built in for drawing text on header?
             //menu_cell_basic_header_draw(ctx, cell_layer, "Notes");
             break;
-        case 1:
+        case MENU_SECTION_ACTIONS:
             graphics_draw_text(ctx, TEXT_MENU_HEADER_ACTIONS, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), layerBounds, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
             //menu_cell_basic_header_draw(ctx, cell_layer, "Actions");
             break;
+        case MENU_SECTION_ABOUT:
+            graphics_draw_text(ctx, TEXT_MENU_HEADER_ABOUT, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), layerBounds, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
+            break;
     }
+
+    #if !PBL_COLOR
+    graphics_context_set_fill_color(ctx, COLOR_TEXT_DARK);
+    //Draw dots along top and bottom to better distinguish between header and selected item
+    for(int i = 0; i < layerBounds.size.w; i += 2){
+        GPoint top;
+        GPoint bottom;
+        top.x = i;
+        top.y = 0;
+        bottom.x = i;
+        bottom.y = layerBounds.size.h - 1;
+        graphics_draw_pixel(ctx, top);
+        graphics_draw_pixel(ctx, bottom);
+    }
+    #endif
 }
 
 void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
@@ -339,31 +364,38 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
     layerBounds.size.w -= 5;
     #endif
     switch(cell_index->section){
-        case 0:
+        case MENU_SECTION_NOTES:
             //menu_cell_basic_draw(ctx, cell_layer, "Menu Test", NULL, NULL); //Last argument is an icon bitmap
             graphics_draw_text(ctx, noteHeaders[cell_index->row].title, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), layerBounds, GTextOverflowModeTrailingEllipsis, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft), NULL);
-            /*
-            switch(cell_index->row){
-                case 0:
-                    //Basic function built in for drawing text on row?
-                    menu_cell_basic_draw(ctx, cell_layer, "Example with a really long title name", "40 degrees", NULL); //Last argument is an icon bitmap
-                    break;
-            }
-            */
             break;
-        case 1:
+        case MENU_SECTION_ACTIONS:
             switch(cell_index->row){
-                case 0:
+                case MENU_INDEX_ACTION_NEW_NOTE:
                     graphics_draw_text(ctx, TEXT_MENU_CONTENT_NEW_NOTE, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), layerBounds, GTextOverflowModeTrailingEllipsis, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft), NULL);
                     //menu_cell_basic_draw(ctx, cell_layer, "+", NULL, NULL); //Last argument is an icon bitmap
                     break;
-                case 1:
+                case MENU_INDEX_ACTION_REFRESH:
                     graphics_draw_text(ctx, TEXT_MENU_CONTENT_REFRESH, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), layerBounds, GTextOverflowModeTrailingEllipsis, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft), NULL);
                     //menu_cell_basic_draw(ctx, cell_layer, "+", NULL, NULL); //Last argument is an icon bitmap
                     break;
 
             }
             break;
+        case MENU_SECTION_ABOUT:
+            switch(cell_index->row){
+                case MENU_INDEX_ABOUT_ABOUT:
+                    menu_cell_basic_draw(ctx, cell_layer, TEXT_MENU_CONTENT_VERSION, "0.0", NULL);
+                    break;
+                case MENU_INDEX_ABOUT_DEBUG:
+                    menu_cell_basic_draw(ctx, cell_layer, TEXT_MENU_CONTENT_DEBUG, (DEBUG_MODE ? TEXT_ENABLED : TEXT_DISABLED), NULL);
+                    break;
+                case MENU_INDEX_ABOUT_DUMMY_MIC:
+                    menu_cell_basic_draw(ctx, cell_layer, TEXT_MENU_CONTENT_DEBUG_MIC, ((PBL_IF_MICROPHONE_ELSE(false, true) && DEBUG_DUMMY_MIC) ? TEXT_ENABLED : TEXT_DISABLED), NULL);
+                    break;
+                case MENU_INDEX_ABOUT_DUMMY_PHONE:
+                    menu_cell_basic_draw(ctx, cell_layer, TEXT_MENU_CONTENT_DEBUG_PHONE, (DEBUG_DUMMY_PHONE ? TEXT_ENABLED : TEXT_DISABLED), NULL);
+                    break;
+            }
     }
 }
 
@@ -431,7 +463,7 @@ void main_window_load(Window *window){
     if(!mainMenuLayer){
     GRect window_bounds = layer_get_bounds(window_layer);
     mainMenuLayer = menu_layer_create(GRect(0, STATUS_BAR_LAYER_HEIGHT, window_bounds.size.w, window_bounds.size.h - STATUS_BAR_LAYER_HEIGHT));
-    menu_layer_set_highlight_colors(mainMenuLayer, COLOR_SECONDARY, COLOR_TEXT_LIGHT);
+    menu_layer_set_highlight_colors(mainMenuLayer, COLOR_MENU_HIGHLIGHT, COLOR_TEXT_LIGHT);
     menu_layer_set_callbacks(mainMenuLayer, NULL, (MenuLayerCallbacks){
         .get_num_sections = menu_get_num_sections_callback,
         .get_num_rows = menu_get_num_rows_callback,
