@@ -413,14 +413,6 @@ void main_window_load(Window *window){
     app_message_register_inbox_dropped(message_inbox_dropped);
     //256 is size of inbox and outbox.
     app_message_open(APPMSG_INBOX_SIZE, APPMSG_OUTBOX_SIZE);
-   
-    //Old position... race condition! Will fail if the phone responds before the main menu layer is created!
-    /*
-    //Request notes from phone
-    if(recievedNoteCount != noteCount || noteCount == 0){
-        request_notes();
-    }
-    */
 
     if(!mainTimeStatusBar){
         mainTimeStatusBar = status_bar_layer_create();

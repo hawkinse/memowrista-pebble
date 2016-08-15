@@ -4,15 +4,12 @@
 #include "main_window.h"
 #include "note_window.h"
 
-#define NOTE_TITLE_PADDING 4
-
 Window* noteWindow;
 
 StatusBarLayer* noteTimeStatusBar;
 TextLayer* titleTextLayer;
 TextLayer* bodyTextLayer;
 ScrollLayer* noteScrollLayer;
-//ActionBarLayer* noteActionBarLayer;
 Layer* noteButtonHintLayer;
 
 ActionMenuLevel* noteMainActionMenuLevel;
@@ -59,7 +56,7 @@ void note_dictation_replace_title_callback(DictationSession* session, DictationS
         case DictationSessionStatusFailureTranscriptionRejectedWithError:
             break;
         default:
-            error_window_show("Microphone Error!");
+            error_window_show(TEXT_ERROR_MICROPHONE);
     }
 
     //Needed to prevent future dictation sessions from calling this callback
@@ -77,7 +74,7 @@ void note_dictation_replace_body_callback(DictationSession* session, DictationSe
         case DictationSessionStatusFailureTranscriptionRejectedWithError:
             break;
         default:
-            error_window_show("Microphone Error!");
+            error_window_show(TEXT_ERROR_MICROPHONE);
     }
 
     //Needed to prevent future dictation sessions from calling this callback
@@ -95,7 +92,7 @@ void note_dictation_append_body_callback(DictationSession* session, DictationSes
         case DictationSessionStatusFailureTranscriptionRejectedWithError:
             break;
         default:
-            error_window_show("Microphone Error!");
+            error_window_show(TEXT_ERROR_MICROPHONE);
     }
 
     //Needed to prevent future dictation sessions from calling this callback
@@ -120,15 +117,15 @@ void note_action_replace_title_callback(ActionMenu* menu, const ActionMenuItem* 
     DictationSession *session = dictation_session_create(sizeof(noteCurrentHeader->title), note_dictation_replace_title_callback, NULL);
     if(session == NULL){
         APP_LOG(APP_LOG_LEVEL_ERROR, "Dictation session null!");
-        error_window_show("Dictation Null!");
+        error_window_show(TEXT_ERROR_NULL_DICTATION);
         return;
     }
     dictation_session_start(session);
     #elif DEBUG_DUMMY_MIC
     APP_LOG(APP_LOG_LEVEL_INFO, "Debug dummy mic - directly calling callback!");
-    note_dictation_replace_title_callback(NULL, DictationSessionStatusSuccess, "Dummy voice title!", NULL);
+    note_dictation_replace_title_callback(NULL, DictationSessionStatusSuccess, TEXT_DUMMY_MIC_TITLE, NULL);
     #else
-    error_window_show("Microphone needed!");
+    error_window_show(TEXT_ERROR_NO_MICROPHONE);
     #endif
 }
 
@@ -140,15 +137,15 @@ void note_action_replace_body_callback(ActionMenu* menu, const ActionMenuItem* a
     DictationSession *session = dictation_session_create(sizeof(noteBodyText), note_dictation_replace_body_callback, NULL);
     if(session == NULL){
         APP_LOG(APP_LOG_LEVEL_ERROR, "Dictation session null!");
-        error_window_show("Dictation Null!");
+        error_window_show(TEXT_ERROR_NULL_DICTATION);
         return;
     }
     dictation_session_start(session);
     #elif DEBUG_DUMMY_MIC
     APP_LOG(APP_LOG_LEVEL_INFO, "Debug dummy mic - directly calling callback!");
-    note_dictation_replace_body_callback(NULL, DictationSessionStatusSuccess, "Dummy voice body replacement!", NULL);
+    note_dictation_replace_body_callback(NULL, DictationSessionStatusSuccess, TEXT_DUMMY_MIC_BODY, NULL);
     #else
-    error_window_show("Microphone needed!");
+    error_window_show(TEXT_ERROR_NO_MICROPHONE);
     #endif
 }
 
@@ -160,15 +157,15 @@ void note_action_append_body_callback(ActionMenu* menu, const ActionMenuItem* ac
     DictationSession *session = dictation_session_create(sizeof(noteBodyText), note_dictation_append_body_callback, NULL);
     if(session == NULL){
         APP_LOG(APP_LOG_LEVEL_ERROR, "Dictation session null!");
-        error_window_show("Dictation Null!");
+        error_window_show(TEXT_ERROR_NULL_DICTATION);
         return;
     }
     dictation_session_start(session);
     #elif DEBUG_DUMMY_MIC
     APP_LOG(APP_LOG_LEVEL_INFO, "Debug dummy mic - directly calling callback!");
-    note_dictation_append_body_callback(NULL, DictationSessionStatusSuccess, "Dummy voice body appendage!", NULL);    
+    note_dictation_append_body_callback(NULL, DictationSessionStatusSuccess, TEXT_DUMMY_MIC_BODY_APPEND, NULL);    
     #else
-    error_window_show("Microphone needed!");
+    error_window_show(TEXT_ERROR_NO_MICROPHONE);
     #endif
 }
 
@@ -195,12 +192,12 @@ void note_window_hint_update_proc(Layer* layer, GContext* ctx){
     //Placeholder until I can figure out how it's officially done
     GRect layer_bounds = layer_get_bounds(layer);
     GPoint draw_point = {
-        .x = layer_bounds.size.w + 4,
-        .y = layer_bounds.size.h / 2 + 5
+        .x = layer_bounds.size.w + ((MENU_HINT_SIZE / 2) - 1),
+        .y = layer_bounds.size.h / 2 + (MENU_HINT_SIZE / 2)
     };
 
-    graphics_context_set_fill_color(ctx, GColorBlack);
-    graphics_fill_circle(ctx, draw_point, 10);
+    graphics_context_set_fill_color(ctx, COLOR_MENU_HINT);
+    graphics_fill_circle(ctx, draw_point, MENU_HINT_SIZE);
 }
 
 //Called when window is placed onto window stack
@@ -210,7 +207,7 @@ void note_window_load(Window *window){
     noteTimeStatusBar = status_bar_layer_create();
     //status_bar_layer_set_colors(timeStatusBar, PBL_IF_COLOR_ELSE(GColorRajah, GColorDarkGray), GColorWhite);
     #if PBL_COLOR
-    status_bar_layer_set_colors(noteTimeStatusBar, GColorWindsorTan, GColorWhite);
+    status_bar_layer_set_colors(noteTimeStatusBar, COLOR_PRIMARY, COLOR_TEXT_LIGHT);
     #endif
 
     //errorGraphicsLayer = layer_create(layer_get_bounds(window_layer));
@@ -220,21 +217,21 @@ void note_window_load(Window *window){
 
     #if PBL_MICROPHONE || DEBUG_MODE
     noteEditActionMenuLevel = action_menu_level_create(3);
-    action_menu_level_add_action(noteEditActionMenuLevel, "Replace title", note_action_replace_title_callback, NULL);
-    action_menu_level_add_action(noteEditActionMenuLevel, "Replace content", note_action_replace_body_callback, NULL);
-    action_menu_level_add_action(noteEditActionMenuLevel, "Add to content", note_action_append_body_callback, NULL);
-    action_menu_level_add_child(noteMainActionMenuLevel, noteEditActionMenuLevel, "Edit");
+    action_menu_level_add_action(noteEditActionMenuLevel, TEXT_ACTIONMENU_REPLACE_TITLE, note_action_replace_title_callback, NULL);
+    action_menu_level_add_action(noteEditActionMenuLevel, TEXT_ACTIONMENU_REPLACE_BODY, note_action_replace_body_callback, NULL);
+    action_menu_level_add_action(noteEditActionMenuLevel, TEXT_ACTIONMENU_APPEND_BODY, note_action_append_body_callback, NULL);
+    action_menu_level_add_child(noteMainActionMenuLevel, noteEditActionMenuLevel, TEXT_ACTIONMENU_SUBMENU_EDIT);
     #endif
 
-    action_menu_level_add_action(noteMainActionMenuLevel, "Delete", note_action_delete_callback, NULL);
+    action_menu_level_add_action(noteMainActionMenuLevel, TEXT_ACTIONMENU_DELETE, note_action_delete_callback, NULL);
 
     noteActionMenuConfig = malloc(sizeof(ActionMenuConfig));
     noteActionMenuConfig->root_level = noteMainActionMenuLevel;
     noteActionMenuConfig->will_close = note_action_menu_close_pending_callback;
     noteActionMenuConfig->did_close = note_action_menu_close_finished_callback;
     #if PBL_COLOR
-    noteActionMenuConfig->colors.background = GColorWindsorTan;
-    noteActionMenuConfig->colors.foreground = GColorWhite;
+    noteActionMenuConfig->colors.background = COLOR_PRIMARY;
+    noteActionMenuConfig->colors.foreground = COLOR_TEXT_LIGHT;
     #endif
 
     //noteActionBarLayer = action_bar_layer_create();
@@ -301,7 +298,7 @@ void note_window_create(){
     noteWindow = window_create();
 
     if(!noteWindow){
-        error_window_show("Unable to create note window");
+        error_window_show(TEXT_ERROR_NOTE_WINDOW_CREATE_FAILED);
         return;
     }
 
