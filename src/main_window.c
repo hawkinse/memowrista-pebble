@@ -16,7 +16,7 @@ uint32_t recievedNoteCount = 0;
 bool bAutoEnterFirst = false;
 
 #if DEBUG_DUMMY_PHONE
-char dummyNoteBody[NOTE_BODY_SIZE] = "Dummy phone default body!";
+char dummyNoteBody[NOTE_BODY_SIZE] = TEXT_DUMMY_PHONE_DEFAULT_BODY;
 #endif
 
 //NOTE FUNCS
@@ -45,7 +45,7 @@ void generate_dummy_note_headers(uint32_t count){
     //Fill with dummy data
     for(uint32_t i = 0; i < noteCount; i++){
         noteHeaders[i].id = i;
-        strncpy(noteHeaders[i].title, "Dummy note", sizeof(noteHeaders[i]));
+        strncpy(noteHeaders[i].title, TEXT_DUMMY_DEFAULT_TITLE, sizeof(noteHeaders[i]));
     }
 
     if(mainMenuLayer){
@@ -66,7 +66,7 @@ void send_note_request(NoteAppMessageKey msg, int32_t value){
                 APP_LOG(APP_LOG_LEVEL_INFO, "Sent pebble request %d", msg);
             } else {
                 APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending request %d, result %d", (int)msg, (int)outResult);
-                //error_window_show("Unable to send data to phone!");
+                //error_window_show(TEXT_ERROR_SEND_FAILED);
             }
             break;
         case APP_MSG_SEND_TIMEOUT:
@@ -75,7 +75,7 @@ void send_note_request(NoteAppMessageKey msg, int32_t value){
             break;
     	default:
             APP_LOG(APP_LOG_LEVEL_ERROR, "Error preparing the outbox before pebble request %d, result %d",(int)msg, (int)outResult);
-            error_window_show("Unable to send data to phone!");
+            error_window_show(TEXT_ERROR_SEND_FAILED);
     }
     #else
     switch(msg){
@@ -89,19 +89,19 @@ void send_note_request(NoteAppMessageKey msg, int32_t value){
             break;
         case MSG_PEBBLE_REQUEST_NOTE_TITLE:
             printf("Dummy phone mode - setting note default title");
-            response_set_current_note_title("Dummy phone default title!");
+            response_set_current_note_title(TEXT_DUMMY_DEFAULT_TITLE);
             break;
         case MSG_PEBBLE_REQUEST_NOTE_BODY:
-            printf("Dummy phone mode - setting note default body");
+            printf("Dummy phone mode - setting note body");
             response_set_note_body(dummyNoteBody);
             break;
         case MSG_PEBBLE_REQUEST_NOTE_TIME:
             printf("Dummy phone mode - setting note timestamp to 0");
-            response_set_note_timestamp(0);
+            response_set_note_timestamp(DUMMY_PHONE_DEFAULT_TIMESTAMP);
             break;
         case MSG_PEBBLE_DELETE_NOTE:
             printf("Dummy phone mode - delete note. Ignoring request!");
-            error_window_show("Dummy phone note delete");
+            error_window_show(TEXT_DUMMY_PHONE_DELETE);
             break;
         default:
             printf("Dummy phone mode - note request %d unimplemented!", msg);
@@ -123,7 +123,7 @@ void send_note_edit(NoteAppMessageKey msg, int32_t id, char* edit){
                 bAutoEnterFirst = true;
             } else {
                 APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending request %d, result %d", (int)msg, (int)outResult);
-                error_window_show("Unable to send data to phone!");
+                error_window_show(TEXT_ERROR_SEND_FAILED);
             }
             break;
         case APP_MSG_SEND_TIMEOUT:
@@ -132,7 +132,7 @@ void send_note_edit(NoteAppMessageKey msg, int32_t id, char* edit){
             break;
     	default:
             APP_LOG(APP_LOG_LEVEL_ERROR, "Error preparing the outbox before pebble request %d, result %d",(int)msg, (int)outResult);
-            error_window_show("Unable to send data to phone!");
+            error_window_show(TEXT_ERROR_SEND_FAILED);
     }
     #else
     switch(msg){
@@ -197,8 +197,6 @@ void response_set_current_note_id(int32_t id){
 void response_set_current_note_title(char* title){
     strncpy(noteHeaders[recievedNoteCount].title, title, sizeof(noteHeaders[recievedNoteCount].title));
     APP_LOG(APP_LOG_LEVEL_INFO, "Set title of index %d", (int)recievedNoteCount);
-    
-    printf("Response set current note title");
 
     recievedNoteCount++;
     if(recievedNoteCount < noteCount){
@@ -265,7 +263,7 @@ void process_tuple(Tuple *t){
             request_notes();
             break;
         case MSG_PHONE_GENERIC_ERROR:
-            error_window_show("Phone side generic error");
+            error_window_show(TEXT_ERROR_PHONE_GENERIC);
         default:
             APP_LOG(APP_LOG_LEVEL_ERROR, "Recieved unknown key %d with (presumed int) value %d", key, (int)t->value->int32);
     }
@@ -298,7 +296,7 @@ uint16_t menu_get_num_sections_callback(MenuLayer *menu_layer, void *data) {
 uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *data) {
     switch(section_index){
         case 0:
-            return noteCount; //Test value
+            return noteCount;
         case 1:
             return 2;
         default:
@@ -312,8 +310,8 @@ int16_t menu_get_header_height_callback(MenuLayer *menu_layer, uint16_t section_
 }
 
 void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t section_index, void *data) {
-    graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorWindsorTan, GColorBlack));
-    graphics_context_set_text_color(ctx, GColorWhite);
+    graphics_context_set_fill_color(ctx, COLOR_PRIMARY);
+    graphics_context_set_text_color(ctx, COLOR_TEXT_LIGHT);
 
     graphics_fill_rect(ctx, layer_get_bounds(cell_layer), 0, GCornerNone);
 
@@ -322,12 +320,12 @@ void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t 
     switch(section_index){
         case 0:            
             //Draw text with graphics context instead of using a text layer. Final null paremter is for GTextAttributes
-            graphics_draw_text(ctx, "Notes", fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), layerBounds, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
+            graphics_draw_text(ctx, TEXT_MENU_HEADER_NOTES, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), layerBounds, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
             //Basic function built in for drawing text on header?
             //menu_cell_basic_header_draw(ctx, cell_layer, "Notes");
             break;
         case 1:
-            graphics_draw_text(ctx, "Actions", fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), layerBounds, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
+            graphics_draw_text(ctx, TEXT_MENU_HEADER_ACTIONS, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), layerBounds, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
             //menu_cell_basic_header_draw(ctx, cell_layer, "Actions");
             break;
     }
@@ -356,11 +354,11 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
         case 1:
             switch(cell_index->row){
                 case 0:
-                    graphics_draw_text(ctx, "New Note", fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), layerBounds, GTextOverflowModeTrailingEllipsis, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft), NULL);
+                    graphics_draw_text(ctx, TEXT_MENU_CONTENT_NEW_NOTE, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), layerBounds, GTextOverflowModeTrailingEllipsis, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft), NULL);
                     //menu_cell_basic_draw(ctx, cell_layer, "+", NULL, NULL); //Last argument is an icon bitmap
                     break;
                 case 1:
-                    graphics_draw_text(ctx, "Refresh Note List", fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), layerBounds, GTextOverflowModeTrailingEllipsis, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft), NULL);
+                    graphics_draw_text(ctx, TEXT_MENU_CONTENT_REFRESH, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), layerBounds, GTextOverflowModeTrailingEllipsis, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft), NULL);
                     //menu_cell_basic_draw(ctx, cell_layer, "+", NULL, NULL); //Last argument is an icon bitmap
                     break;
 
@@ -401,7 +399,7 @@ void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *da
 // WINDOW FUNCS 
 
 void main_window_round_background_update_proc(Layer* layer, GContext *ctx){
-    graphics_context_set_fill_color(ctx, PBL_IF_COLOR_ELSE(GColorWindsorTan, GColorBlack));
+    graphics_context_set_fill_color(ctx, COLOR_PRIMARY);
     graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
 }
 
@@ -414,7 +412,7 @@ void main_window_load(Window *window){
     app_message_register_inbox_received(message_inbox);
     app_message_register_inbox_dropped(message_inbox_dropped);
     //256 is size of inbox and outbox.
-    app_message_open(2048, 2048);
+    app_message_open(APPMSG_INBOX_SIZE, APPMSG_OUTBOX_SIZE);
    
     //Old position... race condition! Will fail if the phone responds before the main menu layer is created!
     /*
@@ -430,7 +428,7 @@ void main_window_load(Window *window){
 
     //status_bar_layer_set_colors(timeStatusBar, PBL_IF_COLOR_ELSE(GColorRajah, GColorDarkGray), GColorWhite);
     #if PBL_COLOR
-    status_bar_layer_set_colors(mainTimeStatusBar, GColorWindsorTan, GColorWhite);
+    status_bar_layer_set_colors(mainTimeStatusBar, COLOR_PRIMARY, COLOR_TEXT_LIGHT);
     #endif   
 
     //errorGraphicsLayer = layer_create(layer_get_bounds(window_layer));
@@ -441,7 +439,7 @@ void main_window_load(Window *window){
     if(!mainMenuLayer){
     GRect window_bounds = layer_get_bounds(window_layer);
     mainMenuLayer = menu_layer_create(GRect(0, STATUS_BAR_LAYER_HEIGHT, window_bounds.size.w, window_bounds.size.h - STATUS_BAR_LAYER_HEIGHT));
-    menu_layer_set_highlight_colors(mainMenuLayer, PBL_IF_COLOR_ELSE(GColorRajah, GColorDarkGray), GColorWhite);
+    menu_layer_set_highlight_colors(mainMenuLayer, COLOR_SECONDARY, COLOR_TEXT_LIGHT);
     menu_layer_set_callbacks(mainMenuLayer, NULL, (MenuLayerCallbacks){
         .get_num_sections = menu_get_num_sections_callback,
         .get_num_rows = menu_get_num_rows_callback,
@@ -451,8 +449,6 @@ void main_window_load(Window *window){
         .select_click = menu_select_callback
     });
     }
-
-    printf("Main menu layer: %p", mainMenuLayer);
 
     menu_layer_set_click_config_onto_window(mainMenuLayer, window);
     layer_add_child(window_layer, menu_layer_get_layer(mainMenuLayer));
@@ -478,7 +474,7 @@ void main_window_create(){
     mainWindow = window_create();
 
     if(!mainWindow){
-        error_window_show("Unable to create main window");
+        error_window_show(TEXT_ERROR_MAIN_WINDOW_CREATE_FAILED);
         return;
     }
 

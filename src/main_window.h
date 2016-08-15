@@ -1,8 +1,32 @@
 #pragma once
 
+//Debug toggles
 #define DEBUG_MODE 1
 #define DEBUG_DUMMY_MIC 1
 #define DEBUG_DUMMY_PHONE 1
+
+//Main window strings
+#define TEXT_DUMMY_DEFAULT_TITLE "Dummy note"
+#define TEXT_DUMMY_PHONE_DEFAULT_BODY "Dummy phone default body!"
+#define TEXT_DUMMY_PHONE_DELETE "Debug note. Delete Ignored"
+#define TEXT_ERROR_SEND_FAILED "Unable to send data to phone!"
+#define TEXT_ERROR_PHONE_GENERIC "Phone side generic error"
+#define TEXT_ERROR_MAIN_WINDOW_CREATE_FAILED "Unable to create main window"
+#define TEXT_MENU_HEADER_NOTES "Notes"
+#define TEXT_MENU_HEADER_ACTIONS "Actions"
+#define TEXT_MENU_HEADER_ABOUT "About"
+#define TEXT_MENU_CONTENT_NEW_NOTE "New Note"
+#define TEXT_MENU_CONTENT_REFRESH "Refresh Note List"
+
+//Main window numeric constants
+#define DUMMY_PHONE_DEFAULT_TIMESTAMP 0
+#define APPMSG_INBOX_SIZE 2048
+#define APPMSG_OUTBOX_SIZE 2048
+
+#define COLOR_PRIMARY PBL_IF_COLOR_ELSE(GColorWindsorTan, GColorBlack)
+#define COLOR_SECONDARY PBL_IF_COLOR_ELSE(GColorRajah, GColorDarkGray)
+#define COLOR_TEXT_DARK GColorBlack
+#define COLOR_TEXT_LIGHT GColorWhite
 
 typedef enum{
     MSG_PEBBLE_REQUEST_NOTE_COUNT = 0,
