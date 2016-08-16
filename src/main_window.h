@@ -3,7 +3,7 @@
 //Debug toggles
 #define DEBUG_MODE 1
 #define DEBUG_DUMMY_MIC 1
-#define DEBUG_DUMMY_PHONE 1
+#define DEBUG_DUMMY_PHONE 0
 
 //Main window strings
 #define TEXT_DUMMY_DEFAULT_TITLE "Dummy note"
@@ -35,8 +35,13 @@
 #define MENU_SECTION_ACTIONS 1
 #define MENU_SECTION_ABOUT 2
 
+#if DEBUG_MODE || PBL_MICROPHONE
 #define MENU_INDEX_ACTION_NEW_NOTE 0
 #define MENU_INDEX_ACTION_REFRESH 1
+#else
+#define MENU_INDEX_ACTION_REFRESH 0
+#define MENU_INDEX_ACTION_NEW_NOTE 999
+#endif
 
 #define MENU_INDEX_ABOUT_ABOUT 0
 #define MENU_INDEX_ABOUT_DEBUG 1

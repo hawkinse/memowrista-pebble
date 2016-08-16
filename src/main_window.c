@@ -299,7 +299,8 @@ uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_inde
         case MENU_SECTION_NOTES:
             return noteCount;
         case MENU_SECTION_ACTIONS:
-            return 2;
+            //Return 2 for refresh and new note if in debug mode or has a mic. Return 1 for refresh otherwise.
+            return PBL_IF_MICROPHONE_ELSE(2, DEBUG_MODE ? 2 : 1);
         case MENU_SECTION_ABOUT:
             //Return 1 row if not in debug mode for about. Return 4 if in debug mode so we can show debug mode options
             return (DEBUG_MODE ? 4 : 1);
@@ -415,10 +416,10 @@ void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *da
             break;
         case 1:
             switch(cell_index->row){
-                case 0:
+                case MENU_INDEX_ACTION_NEW_NOTE:
                     request_new_note();
                     break;
-                case 1:
+                case MENU_INDEX_ACTION_REFRESH:
                     request_notes();
             }
             break;
@@ -512,10 +513,10 @@ void main_window_create(){
 
     //Generate version string
     char versionTemp[3];
-    snprintf(versionTemp, 3, "%d", VERSION_MAJOR);
+    snprintf(versionTemp, sizeof(versionTemp), "%d", VERSION_MAJOR);
     strcat(versionString, versionTemp);
     strcat(versionString, ".");
-    snprintf(versionTemp, 3, "%d", VERSION_MINOR);
+    snprintf(versionTemp, sizeof(versionTemp), "%d", VERSION_MINOR);
     strcat(versionString, versionTemp);
 }
 
