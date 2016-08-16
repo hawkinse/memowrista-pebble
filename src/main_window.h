@@ -25,7 +25,7 @@
 #define TEXT_ENABLED "Enabled"
 #define TEXT_DISABLED "Disabled"
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 0
+#define VERSION_MINOR 1
 
 //Main window numeric constants
 #define DUMMY_PHONE_DEFAULT_TIMESTAMP 0
@@ -71,6 +71,8 @@ typedef enum{
     MSG_PEBBLE_NEW_NOTE,
     MSG_PEBBLE_SET_EDIT_ID
 } NoteAppMessageKey;
+
+char versionString[7];
 
 //MESSAGE FUNCS
 void send_note_request(NoteAppMessageKey msg, int32_t value);

@@ -363,6 +363,7 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
     #if PBL_RECT
     layerBounds.size.w -= 5;
     #endif
+
     switch(cell_index->section){
         case MENU_SECTION_NOTES:
             //menu_cell_basic_draw(ctx, cell_layer, "Menu Test", NULL, NULL); //Last argument is an icon bitmap
@@ -384,7 +385,7 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
         case MENU_SECTION_ABOUT:
             switch(cell_index->row){
                 case MENU_INDEX_ABOUT_ABOUT:
-                    menu_cell_basic_draw(ctx, cell_layer, TEXT_MENU_CONTENT_VERSION, "0.0", NULL);
+                    menu_cell_basic_draw(ctx, cell_layer, TEXT_MENU_CONTENT_VERSION, versionString, NULL);
                     break;
                 case MENU_INDEX_ABOUT_DEBUG:
                     menu_cell_basic_draw(ctx, cell_layer, TEXT_MENU_CONTENT_DEBUG, (DEBUG_MODE ? TEXT_ENABLED : TEXT_DISABLED), NULL);
@@ -508,6 +509,14 @@ void main_window_create(){
         .load = main_window_load, 
         .unload = main_window_unload
     });
+
+    //Generate version string
+    char versionTemp[3];
+    snprintf(versionTemp, 3, "%d", VERSION_MAJOR);
+    strcat(versionString, versionTemp);
+    strcat(versionString, ".");
+    snprintf(versionTemp, 3, "%d", VERSION_MINOR);
+    strcat(versionString, versionTemp);
 }
 
 void main_window_destroy(){
