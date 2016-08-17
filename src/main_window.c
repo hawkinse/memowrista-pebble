@@ -318,10 +318,8 @@ void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t 
     GRect layerBounds = layer_get_bounds(cell_layer);
     layerBounds.origin.y -= 5;
 
-    #if PBL_COLOR
     graphics_context_set_fill_color(ctx, COLOR_PRIMARY);
     graphics_context_set_text_color(ctx, COLOR_TEXT_LIGHT);
-    #endif
 
     graphics_fill_rect(ctx, layer_get_bounds(cell_layer), 0, GCornerNone);
 
@@ -341,8 +339,9 @@ void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t 
             break;
     }
 
+    //Add dots onto headers for B&W displays to make them more distinct from selections
     #if !PBL_COLOR
-    graphics_context_set_fill_color(ctx, COLOR_TEXT_DARK);
+    graphics_context_set_stroke_color(ctx, COLOR_TEXT_LIGHT);
     //Draw dots along top and bottom to better distinguish between header and selected item
     for(int i = 0; i < layerBounds.size.w; i += 2){
         GPoint top;
