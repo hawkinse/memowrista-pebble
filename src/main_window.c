@@ -342,13 +342,13 @@ void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t 
     //Add dots onto headers for B&W displays to make them more distinct from selections
     #if !PBL_COLOR
     graphics_context_set_stroke_color(ctx, COLOR_TEXT_LIGHT);
-    //Draw dots along top and bottom to better distinguish between header and selected item
     for(int i = 0; i < layerBounds.size.w; i += 2){
         GPoint top;
         GPoint bottom;
         top.x = i;
         top.y = 0;
-        bottom.x = i;
+        //Shift bottom 1px to the right so it looks better if there are no notes and two headers are aligned
+        bottom.x = i + 1;
         bottom.y = layerBounds.size.h - 1;
         graphics_draw_pixel(ctx, top);
         graphics_draw_pixel(ctx, bottom);
