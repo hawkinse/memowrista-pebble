@@ -29,15 +29,20 @@ void load_window_click_provider(void *context){
 void load_window_load(Window *window){
     printf("load window loaded");
     Layer *window_layer = window_get_root_layer(window);
+
+    GRect window_bounds = layer_get_bounds(window_layer);
+    int midWidth = window_bounds.size.w / 2;
+    int midHeight = window_bounds.size.h / 2;
+
     //Load load image into GBitmap. All resources start with RESOURCE_ID_ before the actual resource ID name
-    //loadImage = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_LOAD);
+    loadImage = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_LOADING);
 
     //TODO - Make layout relative to screen center!
 
     //Set up bitmap splahs layer. Square pebbles are 144x168 excluding upcoming Time 2
-    loadImageLayer = bitmap_layer_create(GRect(0, 0, 144, 120));
+    loadImageLayer = bitmap_layer_create(GRect(midWidth - 32, midHeight - 32, 64, 64));
     //Set the layer to display the loaded image
-    //bitmap_layer_set_bitmap(loadImageLayer, loadImage);
+    bitmap_layer_set_bitmap(loadImageLayer, loadImage);
     //Sets how to draw the image. Our image has transparancy, so we need GCompOpSet for this. See Pebble Developer Documentation
     bitmap_layer_set_compositing_mode(loadImageLayer, GCompOpSet);
     //Attach the load image layer to the root window layer

@@ -28,7 +28,12 @@
           "type": "png",
           "name": "APP_ICON",
           "file": "images/app_icon.png"
-        }
+        },
+	{
+	  "type": "png",
+	  "name": "IMAGE_LOADING",
+	  "file": "images/loading.png"
+	}
       ]
     }
   }
