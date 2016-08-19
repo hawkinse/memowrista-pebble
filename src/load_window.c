@@ -37,8 +37,6 @@ void load_window_load(Window *window){
     //Load load image into GBitmap. All resources start with RESOURCE_ID_ before the actual resource ID name
     loadImage = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_LOADING);
 
-    //TODO - Make layout relative to screen center!
-
     //Set up bitmap splahs layer. Square pebbles are 144x168 excluding upcoming Time 2
     loadImageLayer = bitmap_layer_create(GRect(midWidth - 32, midHeight - 32, 64, 64));
     //Set the layer to display the loaded image

@@ -48,7 +48,7 @@ void note_set_modified_timestamp(int32_t timestamp){
 void note_dictation_replace_title_callback(DictationSession* session, DictationSessionStatus status, char* transcription, void* ctx){
     switch(status){
         case DictationSessionStatusSuccess:
-            load_window_show();
+            //load_window_show();
             window_stack_remove(noteWindow, false);
             send_note_edit(MSG_PEBBLE_REPLACE_TITLE, noteCurrentHeader->id, transcription);
             break;
@@ -66,7 +66,7 @@ void note_dictation_replace_title_callback(DictationSession* session, DictationS
 void note_dictation_replace_body_callback(DictationSession* session, DictationSessionStatus status, char* transcription, void* ctx){
     switch(status){
         case DictationSessionStatusSuccess:
-            load_window_show();
+            //load_window_show();
             window_stack_remove(noteWindow, false);
             send_note_edit(MSG_PEBBLE_REPLACE_BODY, noteCurrentHeader->id, transcription);
             break;
@@ -84,7 +84,7 @@ void note_dictation_replace_body_callback(DictationSession* session, DictationSe
 void note_dictation_append_body_callback(DictationSession* session, DictationSessionStatus status, char* transcription, void* ctx){
     switch(status){
         case DictationSessionStatusSuccess:
-            load_window_show();
+            //load_window_show();
             window_stack_remove(noteWindow, false);
             send_note_edit(MSG_PEBBLE_APPEND_BODY, noteCurrentHeader->id, transcription);
             break;
@@ -105,7 +105,7 @@ void note_action_delete_callback(ActionMenu* menu, const ActionMenuItem* action,
     //printf("Note window removed from stack");
     //printf("Note header pointer: %p", noteCurrentHeader);
     send_note_request(MSG_PEBBLE_DELETE_NOTE, noteCurrentHeader->id);
-    load_window_show();
+    //load_window_show();
     window_stack_remove(noteWindow, false);
 }
 
