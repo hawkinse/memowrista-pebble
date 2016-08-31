@@ -26,7 +26,7 @@
       "media": [
         {
           "menuIcon": true,
-          "type": "pbi",
+          "type": "png",
           "name": "APP_ICON",
           "file": "images/app_icon.png"
         },
