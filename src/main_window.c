@@ -24,9 +24,9 @@ void delete_note_headers(){
     if(noteHeaders){
         /*
         for(uint32_t i = noteCount; i > 0; i--){
-            free(noteHeaders[i - 1]);
+            free(&noteHeaders[i - 1]);
         }
-        free(noteHeaders);
+        //free(noteHeaders);
         */
 
         //Think this is sufficient?
@@ -199,6 +199,8 @@ void response_set_current_note_title(char* title){
     APP_LOG(APP_LOG_LEVEL_INFO, "Set title of index %d", (int)recievedNoteCount);
 
     recievedNoteCount++;
+    load_window_set_percentage((float)recievedNoteCount / (float)noteCount);
+
     if(recievedNoteCount < noteCount){
         send_note_request(MSG_PEBBLE_REQUEST_NOTE_ID, recievedNoteCount);
     } else {
