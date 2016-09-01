@@ -19,6 +19,7 @@ void load_window_set_percentage(float percentage){
 }
 
 void load_window_show(){
+    #if DISABLE_LOAD_WINDOW
     #if !DEBUG_DUMMY_PHONE //Some dummy phone code can cause the loading screen to stick, and is so fast that it's not needed.'
     if(!window_stack_contains_window(loadWindow)){
         window_stack_push(loadWindow, true);
@@ -26,7 +27,7 @@ void load_window_show(){
     #else
     printf("Debug dummy phone - loading window requested to show but ignored");
     #endif
-
+    #endif
     m_progressPercentage = 0.0f;
 }
 
@@ -66,6 +67,7 @@ void load_window_click_provider(void *context){
 //Called when window is placed onto window stack
 void load_window_load(Window *window){
     printf("load window loaded");
+    #if DISABLE_LOAD_WINDOW
     Layer *window_layer = window_get_root_layer(window);
 
     GRect window_bounds = layer_get_bounds(window_layer);
@@ -97,10 +99,12 @@ void load_window_load(Window *window){
     text_layer_enable_screen_text_flow_and_paging(loadTextLayer, 2);
 
     window_set_click_config_provider(loadWindow, (ClickConfigProvider)load_window_click_provider);
+    #endif
 }
 
 //Called when removed from window stack.
 void load_window_unload(Window *window){
+    #if DISABLE_LOAD_WINDOW
     printf("Loading window is unloading");
     layer_remove_from_parent(text_layer_get_layer(loadTextLayer));
     layer_remove_from_parent(progressBarLayer);
@@ -115,6 +119,7 @@ void load_window_unload(Window *window){
     loadImage = NULL;
     loadImageLayer = NULL;
     loadTextLayer = NULL;
+    #endif
 }
 
 void load_window_disappear(Window *window){
@@ -127,7 +132,7 @@ void load_window_create(){
     printf("load window create called");
     //Create a new window and store it in global loadWindow
     loadWindow = window_create();
-
+    #if DISABLE_LOAD_WINDOW
     //Set up events (handlers = events for pebble)
     //Arguments: Window to set handlers for, set events we handle via function pointers
     window_set_window_handlers(loadWindow, (WindowHandlers){
@@ -135,6 +140,7 @@ void load_window_create(){
         .unload = load_window_unload,
         .disappear = load_window_disappear
     });
+    #endif
 
 }
 

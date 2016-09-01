@@ -3,7 +3,7 @@
 //Debug toggles
 #define DEBUG_MODE 1
 #define DEBUG_DUMMY_MIC 1
-#define DEBUG_DUMMY_PHONE 1
+#define DEBUG_DUMMY_PHONE 0
 
 //Main window strings
 #define TEXT_DUMMY_DEFAULT_TITLE "Dummy note"
@@ -29,8 +29,8 @@
 
 //Main window numeric constants
 #define DUMMY_PHONE_DEFAULT_TIMESTAMP 0
-#define APPMSG_INBOX_SIZE 2048
-#define APPMSG_OUTBOX_SIZE 2048
+#define APPMSG_INBOX_SIZE NOTE_BODY_SIZE
+#define APPMSG_OUTBOX_SIZE NOTE_BODY_SIZE
 #define MENU_SECTION_NOTES 0
 #define MENU_SECTION_ACTIONS 1
 #define MENU_SECTION_ABOUT 2

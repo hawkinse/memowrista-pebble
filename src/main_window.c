@@ -216,7 +216,6 @@ void response_set_current_note_title(char* title){
             //Actually scroll so the selected index is in view
             ScrollLayer* menuScrollLayer = menu_layer_get_scroll_layer(mainMenuLayer);
             scroll_layer_set_content_offset(menuScrollLayer, (GPoint){0,0}, false);
-
             //Automatically enter the first note if true. Used when a new note is made from the watch.
             if(bAutoEnterFirst){
                 send_note_request(MSG_PEBBLE_REQUEST_NOTE_BODY, noteHeaders[0].id);
@@ -409,6 +408,7 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
 void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
 	//Called when a menu item is clicked with select button. 
     APP_LOG(APP_LOG_LEVEL_INFO, "main menu select callback");
+    printf("Free bytes: %d", heap_bytes_free());
     switch(cell_index->section){
         case 0:            
             printf("Cell index: %d", cell_index->row);

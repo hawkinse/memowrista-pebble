@@ -19,7 +19,7 @@
 #define MENU_HINT_SIZE 10
 
 typedef struct{
-    char title[256];
+    char title[96];
     uint32_t id;
 } NoteHeader;
 
