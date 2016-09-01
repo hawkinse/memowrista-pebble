@@ -82,7 +82,7 @@ void load_window_load(Window *window){
     loadImage = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_LOADING);
 
     //Set up bitmap splahs layer. Square pebbles are 144x168 excluding upcoming Time 2
-    loadImageLayer = bitmap_layer_create(GRect(midWidth - 32, midHeight - 32, 64, 64));
+    loadImageLayer = bitmap_layer_create(GRect(midWidth - 32, midHeight - 48, 64, 64));
     //Set the layer to display the loaded image
     bitmap_layer_set_bitmap(loadImageLayer, loadImage);
     //Sets how to draw the image. Our image has transparancy, so we need GCompOpSet for this. See Pebble Developer Documentation
