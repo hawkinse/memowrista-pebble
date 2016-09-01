@@ -26,9 +26,8 @@ int32_t noteModifyTimestamp;
 
 void note_set_body(NoteHeader* header, char* bodyText){
     noteCurrentHeader = header;
+
     strncpy(noteBodyText, bodyText, sizeof(noteBodyText));
-    //strncpy(noteModifyDate, modDate, sizeof(noteModifyDate));
-    //strncpy(noteModifyTime, modTime, sizeof(noteModifyTime));
 
     if(titleTextLayer){
         layer_mark_dirty(text_layer_get_layer(titleTextLayer));
@@ -180,7 +179,12 @@ void note_action_menu_close_finished_callback(ActionMenu* menu, const ActionMenu
 // WINDOW FUNCS 
 void note_button_select_callback(ClickRecognizerRef recognizer, void* context){
     printf("note window middle click pressed!");
-    action_menu_open(noteActionMenuConfig);
+    if(noteActionMenuConfig != NULL){
+        APP_LOG(APP_LOG_LEVEL_INFO, "noteActionMenuConfig pointer: %p", noteActionMenuConfig);
+        action_menu_open(noteActionMenuConfig);
+    } else {
+        APP_LOG(APP_LOG_LEVEL_ERROR, "noteActionMenuConfig is null!!!");
+    }
 }
 
 void note_window_click_provider(void *context){
@@ -202,6 +206,7 @@ void note_window_hint_update_proc(Layer* layer, GContext* ctx){
 
 //Called when window is placed onto window stack
 void note_window_load(Window *window){
+    printf("Note window load started. Free bytes: %d", heap_bytes_free());
     Layer* window_layer = window_get_root_layer(window);
 
     noteTimeStatusBar = status_bar_layer_create();
@@ -275,25 +280,43 @@ void note_window_load(Window *window){
     layer_set_update_proc(noteButtonHintLayer, note_window_hint_update_proc);
     layer_add_child(window_layer, noteButtonHintLayer);
 
-    printf("Free bytes: %d", heap_bytes_free());
+    printf("Note window loaded. Free bytes: %d", heap_bytes_free());
 }
 
 //Called when removed from window stack.
 void note_window_unload(Window *window){
+    layer_remove_from_parent(status_bar_layer_get_layer(noteTimeStatusBar));
+    layer_remove_from_parent(text_layer_get_layer(titleTextLayer));
+    layer_remove_from_parent(text_layer_get_layer(bodyTextLayer));
+    layer_remove_from_parent(scroll_layer_get_layer(noteScrollLayer));
+    layer_remove_from_parent(noteButtonHintLayer);
+
     //action_bar_layer_remove_from_window(noteActionBarLayer);
     status_bar_layer_destroy(noteTimeStatusBar);
     text_layer_destroy(titleTextLayer);
     text_layer_destroy(bodyTextLayer);
     scroll_layer_destroy(noteScrollLayer);
     layer_destroy(noteButtonHintLayer);
-    //action_bar_layer_destroy(noteActionBarLayer);
+    
     action_menu_hierarchy_destroy(noteMainActionMenuLevel, NULL, NULL);
+    
+    //action_bar_layer_destroy(noteActionBarLayer);
     free(noteActionMenuConfig);
     noteActionMenuConfig = NULL;
     //noteCurrentHeader = NULL;
+
+    noteTimeStatusBar = NULL;
+    titleTextLayer = NULL;
+    bodyTextLayer = NULL;
+    noteScrollLayer = NULL;
+    noteButtonHintLayer = NULL;
+    noteMainActionMenuLevel = NULL;
+
+    printf("Note window unloaded. Free bytes: %d", heap_bytes_free());
 }
 
 void note_window_create(){
+    printf("Note window created!");
     //Create a new window and store it in global splashWindow
     noteWindow = window_create();
 
@@ -311,6 +334,7 @@ void note_window_create(){
 }
 
 void note_window_destroy(){
+    printf("Note window destroyed!");
     //Built in window destroy function for pebble?
     window_destroy(noteWindow);
 }

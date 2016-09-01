@@ -172,12 +172,16 @@ void request_notes(){
 void response_set_note_count(int32_t count){
     //Push loading screen. Do this here instead of request_notes since request_notes is called from load callback. Pushing a window during load will crash.
     load_window_show();
-
+    
+    APP_LOG(APP_LOG_LEVEL_INFO, "Bytes free before deleteing and reallocating headers: %d", (int)heap_bytes_free());
+    
     delete_note_headers();
     noteCount = count;
     APP_LOG(APP_LOG_LEVEL_INFO, "About to allocate %d bytes for note headers", (int)(sizeof(NoteHeader) * /*noteCount*/count));
     noteHeaders = malloc(sizeof(NoteHeader) * noteCount);
     APP_LOG(APP_LOG_LEVEL_INFO, "Note count set to %d from %d", (int)noteCount, (int)count);
+
+    APP_LOG(APP_LOG_LEVEL_INFO, "Bytes free after deleteing and reallocating headers: %d", (int)heap_bytes_free());
 
     if(/*noteCount*/count > 0){
         //Send a reqest for the next ID, using the recieved note count as an index on the Android side
@@ -218,7 +222,7 @@ void response_set_current_note_title(char* title){
                 send_note_request(MSG_PEBBLE_REQUEST_NOTE_BODY, noteHeaders[0].id);
                 bAutoEnterFirst = false;
             } else {
-                printf("Removing window from stack");
+                printf("Removing load window from stack");
                 window_stack_remove(load_window_get_window(), true);
             }
         } else {
@@ -404,10 +408,9 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
 
 void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
 	//Called when a menu item is clicked with select button. 
-    char* selectedString = malloc(sizeof(char) * 60);
+    APP_LOG(APP_LOG_LEVEL_INFO, "main menu select callback");
     switch(cell_index->section){
         case 0:            
-            snprintf(selectedString, sizeof(selectedString), "Existing note %d selected!", cell_index->row);
             printf("Cell index: %d", cell_index->row);
             /*
             note_set_contents(&noteHeaders[cell_index->row], "This is long body text that I'm hoping is long enough to require wrapping so I can test proper scrolling with dynamic text. Apparently I need to make it just a little bit longer before it can scroll, hopefully adding this next sentence does the trick. I cant wait to remove this string, it makes for poor code readability but it's too temporary to justify making a static var for it.", "1970/01/01", "12:00:00 AM");
@@ -424,10 +427,7 @@ void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *da
                     request_notes();
             }
             break;
-    }
-    free(selectedString);
-    //Temporary... clicking a row generates an error window
-    //error_window_show("Error message");    
+    } 
 }
 
 
@@ -491,7 +491,12 @@ void main_window_unload(Window *window){
     //Provided workaround for crash on second call of error_window_show
     //errorGraphicsLayer = NULL;
 
+    //Remove layers before delete.
+    layer_remove_from_parent(menu_layer_get_layer(mainMenuLayer));
+    layer_remove_from_parent(status_bar_layer_get_layer(mainTimeStatusBar));
+
     delete_note_headers();
+
     menu_layer_destroy(mainMenuLayer);
     status_bar_layer_destroy(mainTimeStatusBar);
 }

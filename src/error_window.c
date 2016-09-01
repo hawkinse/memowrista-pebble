@@ -61,6 +61,7 @@ void error_window_load(Window *window){
 
 //Called when removed from window stack.
 void error_window_unload(Window *window){
+    layer_remove_from_parent(errorGraphicsLayer);
     layer_destroy(errorGraphicsLayer);
     //Provided workaround for crash on second call of error_window_show
     errorGraphicsLayer = NULL;

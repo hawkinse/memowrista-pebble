@@ -97,19 +97,28 @@ void load_window_load(Window *window){
     text_layer_enable_screen_text_flow_and_paging(loadTextLayer, 2);
 
     window_set_click_config_provider(loadWindow, (ClickConfigProvider)load_window_click_provider);
-
-    printf("load window load finished");
 }
 
 //Called when removed from window stack.
 void load_window_unload(Window *window){
+    printf("Loading window is unloading");
+    layer_remove_from_parent(text_layer_get_layer(loadTextLayer));
+    layer_remove_from_parent(progressBarLayer);
+    layer_remove_from_parent(bitmap_layer_get_layer(loadImageLayer));
+
     layer_destroy(progressBarLayer);
     gbitmap_destroy(loadImage);
     bitmap_layer_destroy(loadImageLayer);
     text_layer_destroy(loadTextLayer);
+
+    progressBarLayer = NULL;
+    loadImage = NULL;
+    loadImageLayer = NULL;
+    loadTextLayer = NULL;
 }
 
 void load_window_disappear(Window *window){
+    printf("load_window_disappear");
     //Explicitly pull window out of the stack. 
     window_stack_remove(window, true);
 }
