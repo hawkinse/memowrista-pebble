@@ -1,7 +1,7 @@
 #pragma once
 
 //Debug toggles
-#define DEBUG_MODE 1
+#define DEBUG_MODE 0
 #define DEBUG_DUMMY_MIC 1
 #define DEBUG_DUMMY_PHONE 0
 
@@ -29,8 +29,16 @@
 
 //Main window numeric constants
 #define DUMMY_PHONE_DEFAULT_TIMESTAMP 0
+
+//Set app message size to the size of a note body since that's the largest message possible
+//On Aplite without dummy mic, the outbox can be a lot smaller since we don't need to send strings'
 #define APPMSG_INBOX_SIZE NOTE_BODY_SIZE
 #define APPMSG_OUTBOX_SIZE NOTE_BODY_SIZE
+#if PBL_PLATFORM_APLITE && !(DEBUG_MODE && DEBUG_DUMMY_MIC)
+#undef APPMSG_OUTBOX_SIZE
+#define APPMSG_OUTBOX_SIZE 16
+#endif
+
 #define MENU_SECTION_NOTES 0
 #define MENU_SECTION_ACTIONS 1
 #define MENU_SECTION_ABOUT 2
