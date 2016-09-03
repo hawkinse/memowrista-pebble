@@ -7,6 +7,7 @@ GBitmap* loadImage;
 BitmapLayer* loadImageLayer;
 TextLayer* loadTextLayer;
 Layer* progressBarLayer;
+Layer* backgroundLayer;
 
 char* loadText = "Loading...";
 float m_progressPercentage = 0.0f;
@@ -29,6 +30,12 @@ void load_window_show(){
     #endif
     #endif
     m_progressPercentage = 0.0f;
+}
+
+void background_layer_proc(Layer* layer, GContext* ctx){
+    GRect layer_bounds = layer_get_bounds(layer);
+    graphics_context_set_fill_color(ctx, COLOR_BACKGROUND);
+    graphics_fill_rect(ctx, layer_bounds, 0, GCornerNone);
 }
 
 void progress_bar_proc(Layer *layer, GContext *ctx){
@@ -74,12 +81,16 @@ void load_window_load(Window *window){
     int midWidth = window_bounds.size.w / 2;
     int midHeight = window_bounds.size.h / 2;
 
+    backgroundLayer = layer_create(window_bounds);
+    layer_set_update_proc(backgroundLayer, background_layer_proc);
+    layer_add_child(window_layer, backgroundLayer);
+
     progressBarLayer = layer_create(GRect(midWidth - PROGRESS_BAR_WIDTH / 2, midHeight + 36, PROGRESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT ));
     layer_set_update_proc(progressBarLayer, progress_bar_proc);    
     layer_add_child(window_layer, progressBarLayer);
 
     //Load load image into GBitmap. All resources start with RESOURCE_ID_ before the actual resource ID name
-    loadImage = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_LOADING);
+    loadImage = gbitmap_create_with_resource(IMG_LOADING);
 
     //Set up bitmap splahs layer. Square pebbles are 144x168 excluding upcoming Time 2
     loadImageLayer = bitmap_layer_create(GRect(midWidth - 32, midHeight - 48, 64, 64));
@@ -95,6 +106,8 @@ void load_window_load(Window *window){
     text_layer_set_text(loadTextLayer, loadText);
     text_layer_set_text_alignment(loadTextLayer, GTextAlignmentCenter);
     text_layer_set_font(loadTextLayer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
+    text_layer_set_background_color(loadTextLayer, COLOR_BACKGROUND);
+    text_layer_set_text_color(loadTextLayer, COLOR_LOADING_TEXT);
     layer_add_child(window_layer, text_layer_get_layer(loadTextLayer));
     text_layer_enable_screen_text_flow_and_paging(loadTextLayer, 2);
 
@@ -109,16 +122,19 @@ void load_window_unload(Window *window){
     layer_remove_from_parent(text_layer_get_layer(loadTextLayer));
     layer_remove_from_parent(progressBarLayer);
     layer_remove_from_parent(bitmap_layer_get_layer(loadImageLayer));
+    layer_remove_from_parent(backgroundLayer);
 
     layer_destroy(progressBarLayer);
     gbitmap_destroy(loadImage);
     bitmap_layer_destroy(loadImageLayer);
     text_layer_destroy(loadTextLayer);
+    layer_destroy(backgroundLayer);
 
     progressBarLayer = NULL;
     loadImage = NULL;
     loadImageLayer = NULL;
     loadTextLayer = NULL;
+    backgroundLayer = NULL;
     #endif
 }
 

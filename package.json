@@ -30,11 +30,16 @@
           "name": "APP_ICON",
           "file": "images/app_icon.png"
         },
-	{
-	  "type": "png",
-	  "name": "IMAGE_LOADING",
-	  "file": "images/loading.png"
-	}
+	      {
+	        "type": "png",
+	        "name": "IMAGE_LOADING_BLACK",
+	        "file": "images/loading.png"
+	      },
+        {
+	        "type": "png",
+	        "name": "IMAGE_LOADING_WHITE",
+	        "file": "images/loading_inverted.png"
+	      }
       ]
     }
   }
