@@ -344,8 +344,7 @@ void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t 
             break;
     }
 
-    //Add dots onto headers for B&W displays to make them more distinct from selections
-    #if !PBL_COLOR
+    //Add dots onto headers to distinguish headers from time and selected menu item
     graphics_context_set_stroke_color(ctx, COLOR_TEXT_LIGHT);
     for(int i = 0; i < layerBounds.size.w; i += 2){
         GPoint top;
@@ -358,7 +357,6 @@ void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t 
         graphics_draw_pixel(ctx, top);
         graphics_draw_pixel(ctx, bottom);
     }
-    #endif
 }
 
 void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {

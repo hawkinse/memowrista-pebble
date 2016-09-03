@@ -1,8 +1,8 @@
 #pragma once
 
 //Debug toggles
-#define DEBUG_MODE 0
-#define DEBUG_DUMMY_MIC 1
+#define DEBUG_MODE 1
+#define DEBUG_DUMMY_MIC 0
 #define DEBUG_DUMMY_PHONE 0
 
 //Main window strings
@@ -60,7 +60,7 @@
 #define COLOR_SECONDARY PBL_IF_COLOR_ELSE(GColorRajah, GColorDarkGray)
 #define COLOR_TEXT_DARK GColorBlack
 #define COLOR_TEXT_LIGHT GColorWhite
-#define COLOR_MENU_HIGHLIGHT PBL_IF_COLOR_ELSE(COLOR_SECONDARY, GColorBlack)
+#define COLOR_MENU_HIGHLIGHT COLOR_PRIMARY
 
 typedef enum{
     MSG_PEBBLE_REQUEST_NOTE_COUNT = 0,
