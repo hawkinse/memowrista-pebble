@@ -1,6 +1,7 @@
 #include <pebble.h>
 #include "main_window.h"
 #include "load_window.h"
+#include "logging.h"
 
 Window* loadWindow;
 GBitmap* loadImage;
@@ -26,7 +27,7 @@ void load_window_show(){
         window_stack_push(loadWindow, true);
     }
     #else
-    printf("Debug dummy phone - loading window requested to show but ignored");
+    log_message(APP_LOG_LEVEL_INFO, "Debug dummy phone - loading window requested to show but ignored");
     #endif
     #endif
     m_progressPercentage = 0.0f;
@@ -73,7 +74,7 @@ void load_window_click_provider(void *context){
 
 //Called when window is placed onto window stack
 void load_window_load(Window *window){
-    printf("load window loaded");
+    log_message(APP_LOG_LEVEL_INFO, "load window loaded");
     #if !DISABLE_LOAD_WINDOW
     Layer *window_layer = window_get_root_layer(window);
 
@@ -118,7 +119,7 @@ void load_window_load(Window *window){
 //Called when removed from window stack.
 void load_window_unload(Window *window){
     #if !DISABLE_LOAD_WINDOW
-    printf("Loading window is unloading");
+    log_message(APP_LOG_LEVEL_INFO, "Loading window is unloading");
     layer_remove_from_parent(text_layer_get_layer(loadTextLayer));
     layer_remove_from_parent(progressBarLayer);
     layer_remove_from_parent(bitmap_layer_get_layer(loadImageLayer));
@@ -139,13 +140,13 @@ void load_window_unload(Window *window){
 }
 
 void load_window_disappear(Window *window){
-    printf("load_window_disappear");
+    log_message(APP_LOG_LEVEL_INFO, "load_window_disappear");
     //Explicitly pull window out of the stack. 
     window_stack_remove(window, true);
 }
 
 void load_window_create(){
-    printf("load window create called");
+    log_message(APP_LOG_LEVEL_INFO, "load window create called");
     //Create a new window and store it in global loadWindow
     loadWindow = window_create();
     #if !DISABLE_LOAD_WINDOW

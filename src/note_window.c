@@ -3,6 +3,7 @@
 #include "load_window.h"
 #include "main_window.h"
 #include "note_window.h"
+#include "logging.h"
 
 Window* noteWindow;
 
@@ -112,16 +113,16 @@ void note_action_replace_title_callback(ActionMenu* menu, const ActionMenuItem* 
     printf("Replace note title called");
     
     #if PBL_MICROPHONE
-    APP_LOG(PBL_MICROPHONE, "Microphone native!");
+    log_message(APP_LOG_LEVEL_INFO, "Microphone native!");
     DictationSession *session = dictation_session_create(sizeof(noteCurrentHeader->title), note_dictation_replace_title_callback, NULL);
     if(session == NULL){
-        APP_LOG(APP_LOG_LEVEL_ERROR, "Dictation session null!");
+        log_message(APP_LOG_LEVEL_ERROR, "Dictation session null!");
         error_window_show(TEXT_ERROR_NULL_DICTATION);
         return;
     }
     dictation_session_start(session);
     #elif DEBUG_DUMMY_MIC
-    APP_LOG(APP_LOG_LEVEL_INFO, "Debug dummy mic - directly calling callback!");
+    log_message(APP_LOG_LEVEL_INFO, "Debug dummy mic - directly calling callback!");
     note_dictation_replace_title_callback(NULL, DictationSessionStatusSuccess, TEXT_DUMMY_MIC_TITLE, NULL);
     #else
     error_window_show(TEXT_ERROR_NO_MICROPHONE);
@@ -132,16 +133,16 @@ void note_action_replace_body_callback(ActionMenu* menu, const ActionMenuItem* a
     printf("Replace note body called");
 
     #if PBL_MICROPHONE
-    APP_LOG(PBL_MICROPHONE, "Microphone native!");
+    log_message(APP_LOG_LEVEL_INFO, "Microphone native!");
     DictationSession *session = dictation_session_create(sizeof(noteBodyText), note_dictation_replace_body_callback, NULL);
     if(session == NULL){
-        APP_LOG(APP_LOG_LEVEL_ERROR, "Dictation session null!");
+        log_message(APP_LOG_LEVEL_ERROR, "Dictation session null!");
         error_window_show(TEXT_ERROR_NULL_DICTATION);
         return;
     }
     dictation_session_start(session);
     #elif DEBUG_DUMMY_MIC
-    APP_LOG(APP_LOG_LEVEL_INFO, "Debug dummy mic - directly calling callback!");
+    log_message(APP_LOG_LEVEL_INFO, "Debug dummy mic - directly calling callback!");
     note_dictation_replace_body_callback(NULL, DictationSessionStatusSuccess, TEXT_DUMMY_MIC_BODY, NULL);
     #else
     error_window_show(TEXT_ERROR_NO_MICROPHONE);
@@ -152,16 +153,16 @@ void note_action_append_body_callback(ActionMenu* menu, const ActionMenuItem* ac
     printf("Append note body called");
     
     #if PBL_MICROPHONE
-    APP_LOG(APP_LOG_LEVEL_INFO, "Microphone native!");
+    log_message(APP_LOG_LEVEL_INFO, "Microphone native!");
     DictationSession *session = dictation_session_create(sizeof(noteBodyText), note_dictation_append_body_callback, NULL);
     if(session == NULL){
-        APP_LOG(APP_LOG_LEVEL_ERROR, "Dictation session null!");
+        log_message(APP_LOG_LEVEL_ERROR, "Dictation session null!");
         error_window_show(TEXT_ERROR_NULL_DICTATION);
         return;
     }
     dictation_session_start(session);
     #elif DEBUG_DUMMY_MIC
-    APP_LOG(APP_LOG_LEVEL_INFO, "Debug dummy mic - directly calling callback!");
+    log_message(APP_LOG_LEVEL_INFO, "Debug dummy mic - directly calling callback!");
     note_dictation_append_body_callback(NULL, DictationSessionStatusSuccess, TEXT_DUMMY_MIC_BODY_APPEND, NULL);    
     #else
     error_window_show(TEXT_ERROR_NO_MICROPHONE);
@@ -180,10 +181,11 @@ void note_action_menu_close_finished_callback(ActionMenu* menu, const ActionMenu
 void note_button_select_callback(ClickRecognizerRef recognizer, void* context){
     printf("note window middle click pressed!");
     if(noteActionMenuConfig != NULL){
-        APP_LOG(APP_LOG_LEVEL_INFO, "noteActionMenuConfig pointer: %p", noteActionMenuConfig);
+        //TODO - add log function for pointers?
+        log_message_int(APP_LOG_LEVEL_INFO, "noteActionMenuConfig pointer: %p", (int)noteActionMenuConfig);
         action_menu_open(noteActionMenuConfig);
     } else {
-        APP_LOG(APP_LOG_LEVEL_ERROR, "noteActionMenuConfig is null!!!");
+        log_message(APP_LOG_LEVEL_ERROR, "noteActionMenuConfig is null!!!");
     }
 }
 
@@ -206,7 +208,7 @@ void note_window_hint_update_proc(Layer* layer, GContext* ctx){
 
 //Called when window is placed onto window stack
 void note_window_load(Window *window){
-    printf("Note window load started. Free bytes: %d", heap_bytes_free());
+    log_message_int(APP_LOG_LEVEL_INFO, "Note window load started. Free bytes: %d", heap_bytes_free());
     Layer* window_layer = window_get_root_layer(window);
 
     noteTimeStatusBar = status_bar_layer_create();
@@ -280,7 +282,7 @@ void note_window_load(Window *window){
     layer_set_update_proc(noteButtonHintLayer, note_window_hint_update_proc);
     layer_add_child(window_layer, noteButtonHintLayer);
 
-    printf("Note window loaded. Free bytes: %d", heap_bytes_free());
+    log_message_int(APP_LOG_LEVEL_INFO, "Note window loaded. Free bytes: %d", heap_bytes_free());
 }
 
 //Called when removed from window stack.
@@ -312,11 +314,11 @@ void note_window_unload(Window *window){
     noteButtonHintLayer = NULL;
     noteMainActionMenuLevel = NULL;
 
-    printf("Note window unloaded. Free bytes: %d", heap_bytes_free());
+    log_message_int(APP_LOG_LEVEL_INFO, "Note window unloaded. Free bytes: %d", heap_bytes_free());
 }
 
 void note_window_create(){
-    printf("Note window created!");
+    log_message(APP_LOG_LEVEL_INFO, "Note window created!");
     //Create a new window and store it in global splashWindow
     noteWindow = window_create();
 
@@ -334,7 +336,7 @@ void note_window_create(){
 }
 
 void note_window_destroy(){
-    printf("Note window destroyed!");
+    log_message(APP_LOG_LEVEL_INFO, "Note window destroyed!");
     //Built in window destroy function for pebble?
     window_destroy(noteWindow);
 }

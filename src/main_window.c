@@ -3,6 +3,7 @@
 #include "load_window.h"
 #include "note_window.h"
 #include "main_window.h"
+#include "logging.h"
 
 Window* mainWindow;
 StatusBarLayer* mainTimeStatusBar;
@@ -18,27 +19,6 @@ bool bAutoEnterFirst = false;
 #if DEBUG_DUMMY_PHONE
 char dummyNoteBody[NOTE_BODY_SIZE] = TEXT_DUMMY_PHONE_DEFAULT_BODY;
 #endif
-
-//PLACEHOLDER LOCATION - MOVE TO OWN FILE IN FUTURE!
-void log_message(AppLogLevel level, char* msg){
-    #if DEBUG_LOGGING
-    APP_LOG(level, msg);
-    #endif
-}
-
-//PLACEHOLDER LOCATION - MOVE TO OWN FILE IN FUTURE!
-void log_message_int(AppLogLevel level, char* msg, int val){
-    #if DEBUG_LOGGING
-    APP_LOG(level, msg, val);
-    #endif
-}
-
-//PLACEHOLDER LOCATION - MOVE TO OWN FILE IN FUTURE!
-void log_message_string(AppLogLevel level, char* msg, char* val){
-    #if DEBUG_LOGGING
-    APP_LOG(level, msg, val);
-    #endif
-}
 
 //NOTE FUNCS
 void delete_note_headers(){

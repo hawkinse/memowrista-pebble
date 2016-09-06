@@ -1,5 +1,8 @@
 #include <pebble.h>
 #include "error_window.h"
+//TODO - move logging functions to their own header file and remove include of main window!
+#include "main_window.h"
+#include "logging.h"
 
 Window *errorWindow;
 Layer *errorGraphicsLayer;
@@ -45,7 +48,7 @@ void error_graphics_proc(Layer *layer, GContext *ctx){
 
 //Called when window is placed onto window stack
 void error_window_load(Window *window){
-    printf("Error window loaded");
+    log_message(APP_LOG_LEVEL_INFO, "Error window loaded");
     Layer *window_layer = window_get_root_layer(window);
 
     errorGraphicsLayer = layer_create(layer_get_bounds(window_layer));
@@ -56,7 +59,7 @@ void error_window_load(Window *window){
     
     layer_add_child(window_layer, errorGraphicsLayer);
 
-    printf("Error window load finished");
+    log_message(APP_LOG_LEVEL_INFO, "Error window load finished");
 }
 
 //Called when removed from window stack.
@@ -68,7 +71,7 @@ void error_window_unload(Window *window){
 }
 
 void error_window_create(){
-    printf("Error window create called");
+    log_message(APP_LOG_LEVEL_INFO, "Error window create called");
     //Create a new window and store it in global splashWindow
     errorWindow = window_create();
 
