@@ -54,6 +54,21 @@ void generate_dummy_note_headers(uint32_t count){
 }
 #endif
 
+
+bool com_version_check(int version){
+    if(version != VERSION_COM){
+        if(version > VERSION_COM){
+            error_window_show(TEXT_ERROR_UPDATE_PEBBLE);
+        } else {
+            error_window_show(TEXT_ERROR_UPDATE_PHONE);
+        }
+
+        window_stack_remove(mainWindow, true);
+    }
+
+    return (version == VERSION_COM);
+}
+
 void send_note_request(NoteAppMessageKey msg, int32_t value){
     #if !DEBUG_DUMMY_PHONE
     DictionaryIterator *outDict;
@@ -103,6 +118,9 @@ void send_note_request(NoteAppMessageKey msg, int32_t value){
             printf("Dummy phone mode - delete note. Ignoring request!");
             error_window_show(TEXT_DUMMY_PHONE_DELETE);
             break;
+        case MSG_PEBBLE_REQUEST_COM_VERSION:
+            printf("Dummy phone mode - setting version to DUMMY_PHONE_COM_VERSION %d", DUMMY_PHONE_COM_VERSION);
+            request_notes_if_compatible(DUMMY_PHONE_COM_VERSION);
         default:
             printf("Dummy phone mode - note request %d unimplemented!", msg);
     }
@@ -167,6 +185,12 @@ void request_new_note(){
 void request_notes(){
     recievedNoteCount = 0;
     send_note_request(MSG_PEBBLE_REQUEST_NOTE_COUNT, 0);
+}
+
+void request_notes_if_compatible(int version){
+    if(com_version_check(version)){
+        request_notes();
+    }
 }
 
 void response_set_note_count(int32_t count){
@@ -266,6 +290,9 @@ void process_tuple(Tuple *t){
             break;
         case MSG_PHONE_UPDATED:
             request_notes();
+            break;
+        case MSG_PHONE_SEND_COM_VERSION:
+            request_notes_if_compatible(t->value->int32);
             break;
         case MSG_PHONE_GENERIC_ERROR:
             error_window_show(TEXT_ERROR_PHONE_GENERIC);
@@ -478,9 +505,14 @@ void main_window_load(Window *window){
     menu_layer_set_click_config_onto_window(mainMenuLayer, window);
     layer_add_child(window_layer, menu_layer_get_layer(mainMenuLayer));
 
+    //Commented out since it doesn't currently work, and could interfere with version check'
+    /*
     if(recievedNoteCount != noteCount || noteCount == 0){
         request_notes();
     }
+    */
+
+    send_note_request(MSG_PEBBLE_REQUEST_COM_VERSION, 0);
 
     #if DEBUG_LOAD_WINDOW
     load_window_show();

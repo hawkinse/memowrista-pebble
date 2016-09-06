@@ -1,11 +1,5 @@
 #pragma once
 
-//Debug toggles
-#define DEBUG_MODE 1
-#define DEBUG_DUMMY_MIC 0
-#define DEBUG_DUMMY_PHONE 0
-#define DEBUG_LOAD_WINDOW 0
-
 //Main window strings
 #define TEXT_DUMMY_DEFAULT_TITLE "Dummy note"
 #define TEXT_DUMMY_PHONE_DEFAULT_BODY "Dummy phone default body!"
@@ -13,6 +7,8 @@
 #define TEXT_ERROR_SEND_FAILED "Unable to send data to phone!"
 #define TEXT_ERROR_PHONE_GENERIC "Phone side generic error"
 #define TEXT_ERROR_MAIN_WINDOW_CREATE_FAILED "Unable to create main window"
+#define TEXT_ERROR_UPDATE_PEBBLE "Update the pebble app!"
+#define TEXT_ERROR_UPDATE_PHONE "Update the phone app!"
 #define TEXT_MENU_HEADER_NOTES "Notes"
 #define TEXT_MENU_HEADER_NOTES_NONE "No Notes!"
 #define TEXT_MENU_HEADER_ACTIONS "Actions"
@@ -27,9 +23,17 @@
 #define TEXT_DISABLED "Disabled"
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 1
+#define VERSION_COM 0
+
+//Debug toggles
+#define DEBUG_MODE 1
+#define DEBUG_DUMMY_MIC 0
+#define DEBUG_DUMMY_PHONE 0
+#define DEBUG_LOAD_WINDOW 0
 
 //Main window numeric constants
 #define DUMMY_PHONE_DEFAULT_TIMESTAMP 0
+#define DUMMY_PHONE_COM_VERSION VERSION_COM
 
 //Set app message size to the size of a note body since that's the largest message possible
 //On Aplite without dummy mic, the outbox can be a lot smaller since we don't need to send strings'
@@ -84,12 +88,8 @@ typedef enum{
     MSG_PHONE_GENERIC_ERROR,
     MSG_PEBBLE_NEW_NOTE,
     MSG_PEBBLE_SET_EDIT_ID,
-    MSG_PEBBLE_REQUEST_VERSION,
-    MSG_PEBBLE_SEND_VERSION_MAJOR,
-    MSG_PEBBLE_SEND_VERSION_MINOR,
-    MSG_PHONE_REQUEST_VERSION,
-    MSG_PHONE_SEND_VERSION_MAJOR,
-    MSG_PHONE_SEND_VERSION_MINOR
+    MSG_PEBBLE_REQUEST_COM_VERSION,
+    MSG_PHONE_SEND_COM_VERSION
     
 } NoteAppMessageKey;
 
@@ -103,6 +103,8 @@ void send_note_edit(NoteAppMessageKey msg, int32_t id, char* edit);
 void request_new_note();
 
 void request_notes();
+
+void request_notes_if_compatible(int version);
 
 void response_set_note_count(int32_t count);
 
