@@ -19,6 +19,27 @@ bool bAutoEnterFirst = false;
 char dummyNoteBody[NOTE_BODY_SIZE] = TEXT_DUMMY_PHONE_DEFAULT_BODY;
 #endif
 
+//PLACEHOLDER LOCATION - MOVE TO OWN FILE IN FUTURE!
+void log_message(AppLogLevel level, char* msg){
+    #if DEBUG_LOGGING
+    APP_LOG(level, msg);
+    #endif
+}
+
+//PLACEHOLDER LOCATION - MOVE TO OWN FILE IN FUTURE!
+void log_message_int(AppLogLevel level, char* msg, int val){
+    #if DEBUG_LOGGING
+    APP_LOG(level, msg, val);
+    #endif
+}
+
+//PLACEHOLDER LOCATION - MOVE TO OWN FILE IN FUTURE!
+void log_message_string(AppLogLevel level, char* msg, char* val){
+    #if DEBUG_LOGGING
+    APP_LOG(level, msg, val);
+    #endif
+}
+
 //NOTE FUNCS
 void delete_note_headers(){
     if(noteHeaders){
@@ -78,51 +99,54 @@ void send_note_request(NoteAppMessageKey msg, int32_t value){
             dict_write_int(outDict, msg, &value, sizeof(int32_t), true);
             outResult = app_message_outbox_send();
             if(outResult == APP_MSG_OK){
-                APP_LOG(APP_LOG_LEVEL_INFO, "Sent pebble request %d", msg);
+                log_message_int(APP_LOG_LEVEL_INFO, "Sent pebble request %d", msg);
             } else {
-                APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending request %d, result %d", (int)msg, (int)outResult);
+                log_message_int(APP_LOG_LEVEL_ERROR, "Error sending request %d,", (int)msg);
+                log_message_int(APP_LOG_LEVEL_ERROR, "result %d", (int)outResult);
                 //error_window_show(TEXT_ERROR_SEND_FAILED);
             }
             break;
         case APP_MSG_SEND_TIMEOUT:
         case APP_MSG_BUSY:
-            APP_LOG(APP_LOG_LEVEL_ERROR, "Timeout or busy sending msg %d, result %d.", (int)msg, (int)outResult);
+            log_message_int(APP_LOG_LEVEL_ERROR, "Timeout or busy sending msg %d,", (int)msg);
+            log_message_int(APP_LOG_LEVEL_ERROR, "result %d.", (int)outResult);
             break;
     	default:
-            APP_LOG(APP_LOG_LEVEL_ERROR, "Error preparing the outbox before pebble request %d, result %d",(int)msg, (int)outResult);
+            log_message_int(APP_LOG_LEVEL_ERROR, "Error preparing the outbox before pebble request %d,", (int)msg);
+            log_message_int(APP_LOG_LEVEL_ERROR, " result %d", (int)outResult);
             error_window_show(TEXT_ERROR_SEND_FAILED);
     }
-    #else
+    #elif DEBUG_DUMMY_PHONE
     switch(msg){
         case MSG_PEBBLE_REQUEST_NOTE_COUNT:
-            printf("Dummy phone mode - setting note count to 1");
+            log_message(APP_LOG_LEVEL_INFO, "Dummy phone mode - setting note count to 1");
             response_set_note_count(1);
             break;
         case MSG_PEBBLE_REQUEST_NOTE_ID:
-            printf("Dummy phone mode - setting note id to 1");
+            log_message(APP_LOG_LEVEL_INFO, "Dummy phone mode - setting note id to 1");
             response_set_current_note_id(1);
             break;
         case MSG_PEBBLE_REQUEST_NOTE_TITLE:
-            printf("Dummy phone mode - setting note default title");
+            log_message(APP_LOG_LEVEL_INFO, "Dummy phone mode - setting note default title");
             response_set_current_note_title(TEXT_DUMMY_DEFAULT_TITLE);
             break;
         case MSG_PEBBLE_REQUEST_NOTE_BODY:
-            printf("Dummy phone mode - setting note body");
+            log_message(APP_LOG_LEVEL_INFO, "Dummy phone mode - setting note body");
             response_set_note_body(dummyNoteBody);
             break;
         case MSG_PEBBLE_REQUEST_NOTE_TIME:
-            printf("Dummy phone mode - setting note timestamp to 0");
+            log_message(APP_LOG_LEVEL_INFO, "Dummy phone mode - setting note timestamp to 0");
             response_set_note_timestamp(DUMMY_PHONE_DEFAULT_TIMESTAMP);
             break;
         case MSG_PEBBLE_DELETE_NOTE:
-            printf("Dummy phone mode - delete note. Ignoring request!");
+            log_message(APP_LOG_LEVEL_INFO, "Dummy phone mode - delete note. Ignoring request!");
             error_window_show(TEXT_DUMMY_PHONE_DELETE);
             break;
         case MSG_PEBBLE_REQUEST_COM_VERSION:
-            printf("Dummy phone mode - setting version to DUMMY_PHONE_COM_VERSION %d", DUMMY_PHONE_COM_VERSION);
+            log_message_int(APP_LOG_LEVEL_INFO, "Dummy phone mode - setting version to DUMMY_PHONE_COM_VERSION %d", DUMMY_PHONE_COM_VERSION);
             request_notes_if_compatible(DUMMY_PHONE_COM_VERSION);
         default:
-            printf("Dummy phone mode - note request %d unimplemented!", msg);
+            log_message_int(APP_LOG_LEVEL_INFO, "Dummy phone mode - note request %d unimplemented!", msg);
     }
     #endif
 }
@@ -137,38 +161,41 @@ void send_note_edit(NoteAppMessageKey msg, int32_t id, char* edit){
             dict_write_cstring(outDict, msg, edit);
             outResult = app_message_outbox_send();
             if(outResult == APP_MSG_OK){
-                APP_LOG(APP_LOG_LEVEL_INFO, "Sent pebble request %d", msg);
+                log_message_int(APP_LOG_LEVEL_INFO, "Sent pebble request %d", msg);
                 bAutoEnterFirst = true;
             } else {
-                APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending request %d, result %d", (int)msg, (int)outResult);
+                log_message_int(APP_LOG_LEVEL_ERROR, "Error sending request %d,", (int)msg);
+                log_message_int(APP_LOG_LEVEL_ERROR, " result %d", (int)outResult);
                 error_window_show(TEXT_ERROR_SEND_FAILED);
             }
             break;
         case APP_MSG_SEND_TIMEOUT:
         case APP_MSG_BUSY:
-            APP_LOG(APP_LOG_LEVEL_ERROR, "Timeout or busy sending msg %d, result %d.", (int)msg, (int)outResult);
+            log_message_int(APP_LOG_LEVEL_ERROR, "Timeout or busy sending msg %d,", (int)msg);
+            log_message_int(APP_LOG_LEVEL_ERROR, "result %d", (int)outResult);
             break;
     	default:
-            APP_LOG(APP_LOG_LEVEL_ERROR, "Error preparing the outbox before pebble request %d, result %d",(int)msg, (int)outResult);
+            log_message_int(APP_LOG_LEVEL_ERROR, "Error preparing the outbox before pebble request %d,",(int)msg);
+            log_message_int(APP_LOG_LEVEL_ERROR, " result %d", (int)outResult);
             error_window_show(TEXT_ERROR_SEND_FAILED);
     }
-    #else
+    #elif DEBUG_DUMMY_PHONE
     switch(msg){
         case MSG_PEBBLE_REPLACE_TITLE:
-            printf("Dummy phone mode - replacing title of dummy note");
+            log_message(APP_LOG_LEVEL_INFO, "Dummy phone mode - replacing title of dummy note");
             strncpy(noteHeaders[0].title, edit, sizeof(noteHeaders[0].title));
             break;
         case MSG_PEBBLE_REPLACE_BODY:
-            printf("Dummy phone mode - replacing body of dummy note");
+            log_message(APP_LOG_LEVEL_INFO, "Dummy phone mode - replacing body of dummy note");
             strncpy(dummyNoteBody, edit, sizeof(dummyNoteBody));
             break;
         case MSG_PEBBLE_APPEND_BODY:
-            printf("Dummy phone mode - append body of dummy note");
+            log_message(APP_LOG_LEVEL_INFO, "Dummy phone mode - append body of dummy note");
             strcat(dummyNoteBody, "\n");
             strcat(dummyNoteBody, edit);
             break;
         default:
-            printf("Dummy phone mode - note edit %d unimplemented!", msg);
+            log_message_int(APP_LOG_LEVEL_ERROR, "Dummy phone mode - note edit %d unimplemented!", msg);
     }
 
     //Instead of re-requesting notes, just enter first note as otherwise we'll overwrite changes!
@@ -197,15 +224,16 @@ void response_set_note_count(int32_t count){
     //Push loading screen. Do this here instead of request_notes since request_notes is called from load callback. Pushing a window during load will crash.
     load_window_show();
     
-    APP_LOG(APP_LOG_LEVEL_INFO, "Bytes free before deleteing and reallocating headers: %d", (int)heap_bytes_free());
+    log_message_int(APP_LOG_LEVEL_INFO, "Bytes free before deleteing and reallocating headers: %d", (int)heap_bytes_free());
     
     delete_note_headers();
     noteCount = count;
-    APP_LOG(APP_LOG_LEVEL_INFO, "About to allocate %d bytes for note headers", (int)(sizeof(NoteHeader) * /*noteCount*/count));
+    log_message_int(APP_LOG_LEVEL_INFO, "About to allocate %d bytes for note headers", (int)(sizeof(NoteHeader) * /*noteCount*/count));
     noteHeaders = malloc(sizeof(NoteHeader) * noteCount);
-    APP_LOG(APP_LOG_LEVEL_INFO, "Note count set to %d from %d", (int)noteCount, (int)count);
+    log_message_int(APP_LOG_LEVEL_INFO, "Note count set to %d", (int)noteCount);
+    log_message_int(APP_LOG_LEVEL_INFO, "from %d", (int)count);
 
-    APP_LOG(APP_LOG_LEVEL_INFO, "Bytes free after deleteing and reallocating headers: %d", (int)heap_bytes_free());
+    log_message_int(APP_LOG_LEVEL_INFO, "Bytes free after deleteing and reallocating headers: %d", (int)heap_bytes_free());
 
     if(/*noteCount*/count > 0){
         //Send a reqest for the next ID, using the recieved note count as an index on the Android side
@@ -214,9 +242,11 @@ void response_set_note_count(int32_t count){
 }
 
 void response_set_current_note_id(int32_t id){
-    APP_LOG(APP_LOG_LEVEL_INFO, "About to attempt setting ID of index %d to %d", (int)recievedNoteCount, (int)id);
+    log_message_int(APP_LOG_LEVEL_INFO, "About to attempt setting ID of index %d to %d", (int)recievedNoteCount);
+    log_message_int(APP_LOG_LEVEL_INFO, "to %d", (int)id);
     noteHeaders[recievedNoteCount].id = id;
-    APP_LOG(APP_LOG_LEVEL_INFO, "ID of index %d set to %d", (int)recievedNoteCount, (int)id);
+    log_message_int(APP_LOG_LEVEL_INFO, "ID of index %d", (int)recievedNoteCount);
+    log_message_int(APP_LOG_LEVEL_INFO, "set to %d", (int)id);
     //Send a request for the title corresponding to this id
     send_note_request(MSG_PEBBLE_REQUEST_NOTE_TITLE, id);
 }
@@ -224,7 +254,7 @@ void response_set_current_note_id(int32_t id){
 
 void response_set_current_note_title(char* title){
     strncpy(noteHeaders[recievedNoteCount].title, title, sizeof(noteHeaders[recievedNoteCount].title));
-    APP_LOG(APP_LOG_LEVEL_INFO, "Set title of index %d", (int)recievedNoteCount);
+    log_message_int(APP_LOG_LEVEL_INFO, "Set title of index %d", (int)recievedNoteCount);
 
     recievedNoteCount++;
     load_window_set_percentage((float)recievedNoteCount / (float)noteCount);
@@ -232,7 +262,7 @@ void response_set_current_note_title(char* title){
     if(recievedNoteCount < noteCount){
         send_note_request(MSG_PEBBLE_REQUEST_NOTE_ID, recievedNoteCount);
     } else {
-        APP_LOG(APP_LOG_LEVEL_INFO, "Final message recieved!");
+        log_message(APP_LOG_LEVEL_INFO, "Final message recieved!");
         if(mainMenuLayer){
             menu_layer_reload_data(mainMenuLayer);
             menu_layer_set_selected_index(mainMenuLayer, (MenuIndex){0, 0}, MenuRowAlignNone, true);
@@ -245,11 +275,11 @@ void response_set_current_note_title(char* title){
                 send_note_request(MSG_PEBBLE_REQUEST_NOTE_BODY, noteHeaders[0].id);
                 bAutoEnterFirst = false;
             } else {
-                printf("Removing load window from stack");
+                log_message(APP_LOG_LEVEL_INFO, "Removing load window from stack");
                 window_stack_remove(load_window_get_window(), true);
             }
         } else {
-            APP_LOG(APP_LOG_LEVEL_ERROR, "No main menu layer!");
+            log_message(APP_LOG_LEVEL_ERROR, "No main menu layer!");
         }
     }
 }
@@ -270,7 +300,7 @@ void response_set_note_timestamp(int32_t timestamp){
 
 void process_tuple(Tuple *t){
     int key = t->key;
-    APP_LOG(APP_LOG_LEVEL_INFO, "Got key %d", key);
+    log_message_int(APP_LOG_LEVEL_INFO, "Got key %d", key);
 
     switch(key){
         case MSG_PHONE_SEND_NOTE_COUNT:
@@ -297,7 +327,8 @@ void process_tuple(Tuple *t){
         case MSG_PHONE_GENERIC_ERROR:
             error_window_show(TEXT_ERROR_PHONE_GENERIC);
         default:
-            APP_LOG(APP_LOG_LEVEL_ERROR, "Recieved unknown key %d with (presumed int) value %d", key, (int)t->value->int32);
+            log_message_int(APP_LOG_LEVEL_ERROR, "Recieved unknown key %d", key);
+            log_message_int(APP_LOG_LEVEL_ERROR, " with (presumed int) value %d", (int)t->value->int32);
     }
 }
 
@@ -315,7 +346,7 @@ void message_inbox(DictionaryIterator *iter, void *context){
 }
 
 void message_inbox_dropped(AppMessageResult reason, void *context){
-    APP_LOG(APP_LOG_LEVEL_INFO, "Message dropped, reason %d.", reason);
+    log_message_int(APP_LOG_LEVEL_INFO, "Message dropped, reason %d.", reason);
 }
 
 //MAIN MENU FUNCS
@@ -432,11 +463,11 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
 
 void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
 	//Called when a menu item is clicked with select button. 
-    APP_LOG(APP_LOG_LEVEL_INFO, "main menu select callback");
-    printf("Free bytes: %d", heap_bytes_free());
+    log_message(APP_LOG_LEVEL_INFO, "main menu select callback");
+    //log_message_int(APP_LOG_LEVEL_INFO, "Free bytes: %d", heap_bytes_free());
     switch(cell_index->section){
         case 0:            
-            printf("Cell index: %d", cell_index->row);
+            log_message_int(APP_LOG_LEVEL_INFO, "Cell index: %d", cell_index->row);
             /*
             note_set_contents(&noteHeaders[cell_index->row], "This is long body text that I'm hoping is long enough to require wrapping so I can test proper scrolling with dynamic text. Apparently I need to make it just a little bit longer before it can scroll, hopefully adding this next sentence does the trick. I cant wait to remove this string, it makes for poor code readability but it's too temporary to justify making a static var for it.", "1970/01/01", "12:00:00 AM");
             window_stack_push(note_window_get_window(), true);
@@ -449,7 +480,8 @@ void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *da
                     request_new_note();
                     break;
                 case MENU_INDEX_ACTION_REFRESH:
-                    request_notes();
+                    log_message(APP_LOG_LEVEL_INFO, "Requesting notes from menu callback");
+                    request_notes(MSG_PEBBLE_REQUEST_COM_VERSION, 0);
             }
             break;
     } 

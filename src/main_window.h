@@ -29,7 +29,8 @@
 #define DEBUG_MODE 1
 #define DEBUG_DUMMY_MIC 0
 #define DEBUG_DUMMY_PHONE 0
-#define DEBUG_LOAD_WINDOW 0
+#define DEBUG_LOAD_WINDOW  0
+#define DEBUG_LOGGING 0
 
 //Main window numeric constants
 #define DUMMY_PHONE_DEFAULT_TIMESTAMP 0
@@ -94,6 +95,11 @@ typedef enum{
 } NoteAppMessageKey;
 
 char versionString[7];
+
+//PLACEHOLDER LOCATION - MOVE TO OWN FILE IN FUTURE!
+void log_message(AppLogLevel level, char* msg);
+void log_message_int(AppLogLevel level, char* msg, int val);
+void log_message_string(AppLogLevel level, char* msg, char* val);
 
 //MESSAGE FUNCS
 void send_note_request(NoteAppMessageKey msg, int32_t value);
