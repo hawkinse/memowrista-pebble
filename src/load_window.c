@@ -85,7 +85,7 @@ void load_window_load(Window *window){
     layer_set_update_proc(backgroundLayer, background_layer_proc);
     layer_add_child(window_layer, backgroundLayer);
 
-    progressBarLayer = layer_create(GRect(midWidth - PROGRESS_BAR_WIDTH / 2, midHeight + 36, PROGRESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT ));
+    progressBarLayer = layer_create(GRect(midWidth - PROGRESS_BAR_WIDTH / 2, midHeight + 30, PROGRESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT ));
     layer_set_update_proc(progressBarLayer, progress_bar_proc);    
     layer_add_child(window_layer, progressBarLayer);
 

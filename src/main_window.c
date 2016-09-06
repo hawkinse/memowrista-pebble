@@ -481,6 +481,11 @@ void main_window_load(Window *window){
     if(recievedNoteCount != noteCount || noteCount == 0){
         request_notes();
     }
+
+    #if DEBUG_LOAD_WINDOW
+    load_window_show();
+    load_window_set_percentage(0.5);
+    #endif
 }
 
 //Called when removed from window stack.

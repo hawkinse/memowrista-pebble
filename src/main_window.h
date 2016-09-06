@@ -4,6 +4,7 @@
 #define DEBUG_MODE 1
 #define DEBUG_DUMMY_MIC 0
 #define DEBUG_DUMMY_PHONE 0
+#define DEBUG_LOAD_WINDOW 0
 
 //Main window strings
 #define TEXT_DUMMY_DEFAULT_TITLE "Dummy note"
