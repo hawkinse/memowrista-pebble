@@ -61,7 +61,7 @@
 #define MENU_INDEX_ABOUT_DUMMY_MIC 2
 #define MENU_INDEX_ABOUT_DUMMY_PHONE 3
 
-#define COLOR_PRIMARY PBL_IF_COLOR_ELSE(GColorWindsorTan, GColorBlack)
+#define COLOR_PRIMARY PBL_IF_COLOR_ELSE(GColorBulgarianRose, GColorBlack)
 #define COLOR_SECONDARY PBL_IF_COLOR_ELSE(GColorRajah, GColorDarkGray)
 #define COLOR_TEXT_DARK GColorBlack
 #define COLOR_TEXT_LIGHT GColorWhite
