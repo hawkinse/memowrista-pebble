@@ -101,7 +101,7 @@ void note_dictation_append_body_callback(DictationSession* session, DictationSes
 //ACTION BAR FUNCS
 
 void note_action_delete_callback(ActionMenu* menu, const ActionMenuItem* action, void* data){
-    printf("Delete note called");
+    log_message(APP_LOG_LEVEL_INFO, "Delete note called");
     //printf("Note window removed from stack");
     //printf("Note header pointer: %p", noteCurrentHeader);
     send_note_request(MSG_PEBBLE_DELETE_NOTE, noteCurrentHeader->id);
@@ -110,7 +110,7 @@ void note_action_delete_callback(ActionMenu* menu, const ActionMenuItem* action,
 }
 
 void note_action_replace_title_callback(ActionMenu* menu, const ActionMenuItem* action, void* data){
-    printf("Replace note title called");
+    log_message(APP_LOG_LEVEL_INFO, "Replace note title called");
     
     #if PBL_MICROPHONE
     log_message(APP_LOG_LEVEL_INFO, "Microphone native!");
@@ -130,7 +130,7 @@ void note_action_replace_title_callback(ActionMenu* menu, const ActionMenuItem* 
 }
 
 void note_action_replace_body_callback(ActionMenu* menu, const ActionMenuItem* action, void* data){
-    printf("Replace note body called");
+    log_message(APP_LOG_LEVEL_INFO, "Replace note body called");
 
     #if PBL_MICROPHONE
     log_message(APP_LOG_LEVEL_INFO, "Microphone native!");
@@ -150,7 +150,7 @@ void note_action_replace_body_callback(ActionMenu* menu, const ActionMenuItem* a
 }
 
 void note_action_append_body_callback(ActionMenu* menu, const ActionMenuItem* action, void* data){
-    printf("Append note body called");
+    log_message(APP_LOG_LEVEL_INFO, "Append note body called");
     
     #if PBL_MICROPHONE
     log_message(APP_LOG_LEVEL_INFO, "Microphone native!");
@@ -170,18 +170,18 @@ void note_action_append_body_callback(ActionMenu* menu, const ActionMenuItem* ac
 }
 
 void note_action_menu_close_pending_callback(ActionMenu* menu, const ActionMenuItem* action, void* data){
-    printf("Action menu close pending");
+    log_message(APP_LOG_LEVEL_INFO, "Action menu close pending");
 }
 
 void note_action_menu_close_finished_callback(ActionMenu* menu, const ActionMenuItem* action, void* data){
-    printf("Action menu close finished");
+    log_message(APP_LOG_LEVEL_INFO, "Action menu close finished");
+    log_message_int(APP_LOG_LEVEL_INFO, "Free bytes: %d", heap_bytes_free());
 }
 
 // WINDOW FUNCS 
 void note_button_select_callback(ClickRecognizerRef recognizer, void* context){
-    printf("note window middle click pressed!");
+    log_message(APP_LOG_LEVEL_INFO, "note window middle click pressed!");
     if(noteActionMenuConfig != NULL){
-        //TODO - add log function for pointers?
         log_message_int(APP_LOG_LEVEL_INFO, "noteActionMenuConfig pointer: %p", (int)noteActionMenuConfig);
         action_menu_open(noteActionMenuConfig);
     } else {
