@@ -345,8 +345,8 @@ uint16_t menu_get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_inde
             //Return 2 for refresh and new note if in debug mode or has a mic. Return 1 for refresh otherwise.
             return PBL_IF_MICROPHONE_ELSE(2, DEBUG_MODE ? 2 : 1);
         case MENU_SECTION_ABOUT:
-            //Return 1 row if not in debug mode for about. Return 4 if in debug mode so we can show debug mode options
-            return (DEBUG_MODE ? 4 : 1);
+            //Return 1 row if not in debug mode for about. Return 5 if in debug mode so we can show debug mode options
+            return (DEBUG_MODE ? 5 : 1);
         default:
             return 0;
     }
@@ -436,6 +436,9 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
                     break;
                 case MENU_INDEX_ABOUT_DUMMY_PHONE:
                     menu_cell_basic_draw(ctx, cell_layer, TEXT_MENU_CONTENT_DEBUG_PHONE, (DEBUG_DUMMY_PHONE ? TEXT_ENABLED : TEXT_DISABLED), NULL);
+                    break;
+                case MENU_INDEX_ABOUT_LOGGING:
+                    menu_cell_basic_draw(ctx, cell_layer, TEXT_MENU_CONTENT_DEBUG_LOGGING, (DEBUG_LOGGING ? TEXT_ENABLED : TEXT_DISABLED), NULL);
                     break;
             }
     }

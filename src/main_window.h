@@ -19,6 +19,7 @@
 #define TEXT_MENU_CONTENT_DEBUG "Debug Mode"
 #define TEXT_MENU_CONTENT_DEBUG_MIC "Dummy Mic"
 #define TEXT_MENU_CONTENT_DEBUG_PHONE "Dummy Phone"
+#define TEXT_MENU_CONTENT_DEBUG_LOGGING "Debug logging"
 #define TEXT_ENABLED "Enabled"
 #define TEXT_DISABLED "Disabled"
 #define VERSION_MAJOR 0
@@ -26,7 +27,7 @@
 #define VERSION_COM 0
 
 //Debug toggles
-#define DEBUG_MODE 0
+#define DEBUG_MODE 1
 #define DEBUG_DUMMY_MIC 0
 #define DEBUG_DUMMY_PHONE 0
 #define DEBUG_LOAD_WINDOW  0
@@ -60,6 +61,7 @@
 #define MENU_INDEX_ABOUT_DEBUG 1
 #define MENU_INDEX_ABOUT_DUMMY_MIC 2
 #define MENU_INDEX_ABOUT_DUMMY_PHONE 3
+#define MENU_INDEX_ABOUT_LOGGING 4
 
 #define COLOR_PRIMARY PBL_IF_COLOR_ELSE(GColorBulgarianRose, GColorBlack)
 #define COLOR_SECONDARY PBL_IF_COLOR_ELSE(GColorRajah, GColorDarkGray)
