@@ -1,12 +1,12 @@
 {
-  "name": "WristNote",
+  "name": "MemoWrista",
   "author": "Elliot Hawkins",
   "version": "1.0.0",
   "keywords": ["pebble-app"],
   "private": true,
   "dependencies": {},
   "pebble": {
-    "displayName": "WristNote",
+    "displayName": "MemoWrista",
     "uuid": "aff8fea2-a0c1-47b9-b16a-26ef53b45eae",
     "sdkVersion": "3",
     "enableMultiJS": true,
