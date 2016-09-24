@@ -70,7 +70,7 @@ void load_button_back_callback(ClickRecognizerRef recognizer, void* context){
 }
 
 void load_button_up_callback(ClickRecognizerRef recognizer, void* context){
-    #DEBUG_LOAD_WINDOW
+    #if DEBUG_LOAD_WINDOW
     log_message(APP_LOG_LEVEL_INFO, "Load - up button pressed");
     //If we're in debug mode, allow incrementing progress bar
     if(m_progressPercentage < 1.0f){
