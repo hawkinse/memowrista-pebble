@@ -2,7 +2,7 @@
 
 #include <pebble.h>
 
-#define DEBUG_LOGGING 0
+#define DEBUG_LOGGING 1
 
 inline void log_message(AppLogLevel level, char* msg){
     #if DEBUG_LOGGING

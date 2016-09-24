@@ -66,10 +66,45 @@ void progress_bar_proc(Layer *layer, GContext *ctx){
 
 void load_button_back_callback(ClickRecognizerRef recognizer, void* context){
     //Simply exist so the user can't back out of the loading screen
+    log_message(APP_LOG_LEVEL_INFO, "Load - back button pressed");
+}
+
+void load_button_up_callback(ClickRecognizerRef recognizer, void* context){
+    #DEBUG_LOAD_WINDOW
+    log_message(APP_LOG_LEVEL_INFO, "Load - up button pressed");
+    //If we're in debug mode, allow incrementing progress bar
+    if(m_progressPercentage < 1.0f){
+        m_progressPercentage += 0.1f;
+    }
+
+    if(m_progressPercentage >= 1.0f){
+        m_progressPercentage = 1.0f;
+    }
+
+    load_window_set_percentage(m_progressPercentage);
+    #endif
+}
+
+void load_button_down_callback(ClickRecognizerRef recognizer, void* context){
+    #if DEBUG_LOAD_WINDOW
+    log_message(APP_LOG_LEVEL_INFO, "Load - down button pressed");
+    //If we're in debug mode, allow decrementing progress bar
+    if(m_progressPercentage > 0.0f){
+        m_progressPercentage -= 0.1f;
+    }
+
+    if(m_progressPercentage < 0.0f){
+        m_progressPercentage = 0.0f;
+    }
+
+    load_window_set_percentage(m_progressPercentage);
+    #endif
 }
 
 void load_window_click_provider(void *context){
     window_single_click_subscribe(BUTTON_ID_BACK, load_button_back_callback);
+    window_single_click_subscribe(BUTTON_ID_UP, load_button_up_callback);
+    window_single_click_subscribe(BUTTON_ID_DOWN, load_button_down_callback);
 }
 
 //Called when window is placed onto window stack
@@ -112,7 +147,7 @@ void load_window_load(Window *window){
     layer_add_child(window_layer, text_layer_get_layer(loadTextLayer));
     text_layer_enable_screen_text_flow_and_paging(loadTextLayer, 2);
 
-    window_set_click_config_provider(loadWindow, (ClickConfigProvider)load_window_click_provider);
+    window_set_click_config_provider(window, (ClickConfigProvider)load_window_click_provider);
     #endif
 }
 
