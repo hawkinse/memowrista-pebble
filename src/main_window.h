@@ -27,7 +27,7 @@
 #define VERSION_COM 0
 
 //Debug toggles
-#define DEBUG_MODE 1
+#define DEBUG_MODE 0
 #define DEBUG_DUMMY_MIC 0
 #define DEBUG_DUMMY_PHONE 0
 #define DEBUG_LOAD_WINDOW  0
