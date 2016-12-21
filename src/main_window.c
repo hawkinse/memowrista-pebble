@@ -23,14 +23,6 @@ char dummyNoteBody[NOTE_BODY_SIZE] = TEXT_DUMMY_PHONE_DEFAULT_BODY;
 //NOTE FUNCS
 void delete_note_headers(){
     if(noteHeaders){
-        /*
-        for(uint32_t i = noteCount; i > 0; i--){
-            free(&noteHeaders[i - 1]);
-        }
-        //free(noteHeaders);
-        */
-
-        //Think this is sufficient?
         free(noteHeaders);
     }
     noteCount = 0;
@@ -83,7 +75,6 @@ void send_note_request(NoteAppMessageKey msg, int32_t value){
             } else {
                 log_message_int(APP_LOG_LEVEL_ERROR, "Error sending request %d,", (int)msg);
                 log_message_int(APP_LOG_LEVEL_ERROR, "result %d", (int)outResult);
-                //error_window_show(TEXT_ERROR_SEND_FAILED);
             }
             break;
         case APP_MSG_SEND_TIMEOUT:
@@ -208,7 +199,7 @@ void response_set_note_count(int32_t count){
     
     delete_note_headers();
     noteCount = count;
-    log_message_int(APP_LOG_LEVEL_INFO, "About to allocate %d bytes for note headers", (int)(sizeof(NoteHeader) * /*noteCount*/count));
+    log_message_int(APP_LOG_LEVEL_INFO, "About to allocate %d bytes for note headers", (int)(sizeof(NoteHeader) * count));
     noteHeaders = malloc(sizeof(NoteHeader) * noteCount);
     log_message_int(APP_LOG_LEVEL_INFO, "Note count set to %d", (int)noteCount);
     log_message_int(APP_LOG_LEVEL_INFO, "from %d", (int)count);
@@ -370,12 +361,9 @@ void menu_draw_header_callback(GContext* ctx, const Layer *cell_layer, uint16_t 
         case MENU_SECTION_NOTES:            
             //Draw text with graphics context instead of using a text layer. Final null paremter is for GTextAttributes
             graphics_draw_text(ctx, (noteCount > 0 ? TEXT_MENU_HEADER_NOTES : TEXT_MENU_HEADER_NOTES_NONE), fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), layerBounds, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
-            //Basic function built in for drawing text on header?
-            //menu_cell_basic_header_draw(ctx, cell_layer, "Notes");
             break;
         case MENU_SECTION_ACTIONS:
             graphics_draw_text(ctx, TEXT_MENU_HEADER_ACTIONS, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), layerBounds, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
-            //menu_cell_basic_header_draw(ctx, cell_layer, "Actions");
             break;
         case MENU_SECTION_ABOUT:
             graphics_draw_text(ctx, TEXT_MENU_HEADER_ABOUT, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD), layerBounds, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
@@ -407,18 +395,15 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
 
     switch(cell_index->section){
         case MENU_SECTION_NOTES:
-            //menu_cell_basic_draw(ctx, cell_layer, "Menu Test", NULL, NULL); //Last argument is an icon bitmap
             graphics_draw_text(ctx, noteHeaders[cell_index->row].title, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), layerBounds, GTextOverflowModeTrailingEllipsis, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft), NULL);
             break;
         case MENU_SECTION_ACTIONS:
             switch(cell_index->row){
                 case MENU_INDEX_ACTION_NEW_NOTE:
                     graphics_draw_text(ctx, TEXT_MENU_CONTENT_NEW_NOTE, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), layerBounds, GTextOverflowModeTrailingEllipsis, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft), NULL);
-                    //menu_cell_basic_draw(ctx, cell_layer, "+", NULL, NULL); //Last argument is an icon bitmap
                     break;
                 case MENU_INDEX_ACTION_REFRESH:
                     graphics_draw_text(ctx, TEXT_MENU_CONTENT_REFRESH, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD), layerBounds, GTextOverflowModeTrailingEllipsis, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft), NULL);
-                    //menu_cell_basic_draw(ctx, cell_layer, "+", NULL, NULL); //Last argument is an icon bitmap
                     break;
 
             }
@@ -445,16 +430,11 @@ void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *c
 }
 
 void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
-	//Called when a menu item is clicked with select button. 
+    //Called when a menu item is clicked with select button. 
     log_message(APP_LOG_LEVEL_INFO, "main menu select callback");
-    //log_message_int(APP_LOG_LEVEL_INFO, "Free bytes: %d", heap_bytes_free());
     switch(cell_index->section){
         case 0:            
             log_message_int(APP_LOG_LEVEL_INFO, "Cell index: %d", cell_index->row);
-            /*
-            note_set_contents(&noteHeaders[cell_index->row], "This is long body text that I'm hoping is long enough to require wrapping so I can test proper scrolling with dynamic text. Apparently I need to make it just a little bit longer before it can scroll, hopefully adding this next sentence does the trick. I cant wait to remove this string, it makes for poor code readability but it's too temporary to justify making a static var for it.", "1970/01/01", "12:00:00 AM");
-            window_stack_push(note_window_get_window(), true);
-            */
             send_note_request(MSG_PEBBLE_REQUEST_NOTE_BODY, noteHeaders[cell_index->row].id);
             break;
         case 1:
@@ -493,15 +473,11 @@ void main_window_load(Window *window){
         mainTimeStatusBar = status_bar_layer_create();
     }
 
-    //status_bar_layer_set_colors(timeStatusBar, PBL_IF_COLOR_ELSE(GColorRajah, GColorDarkGray), GColorWhite);
     #if PBL_COLOR
     status_bar_layer_set_colors(mainTimeStatusBar, COLOR_PRIMARY, COLOR_TEXT_LIGHT);
     #endif   
 
-    //errorGraphicsLayer = layer_create(layer_get_bounds(window_layer));
     layer_add_child(window_layer, status_bar_layer_get_layer(mainTimeStatusBar));
-
-    //generate_dummy_note_headers(5);
 
     if(!mainMenuLayer){
     GRect window_bounds = layer_get_bounds(window_layer);
@@ -537,10 +513,6 @@ void main_window_load(Window *window){
 
 //Called when removed from window stack.
 void main_window_unload(Window *window){
-    //layer_destroy(errorGraphicsLayer);
-    //Provided workaround for crash on second call of error_window_show
-    //errorGraphicsLayer = NULL;
-
     //Remove layers before delete.
     layer_remove_from_parent(menu_layer_get_layer(mainMenuLayer));
     layer_remove_from_parent(status_bar_layer_get_layer(mainTimeStatusBar));

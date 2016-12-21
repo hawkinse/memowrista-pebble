@@ -17,8 +17,6 @@ int main(void) {
   } else {
     error_window_show("Unable to show main window");
   }
-  
-  //error_window_show("Longer string that might wrap around. ");
 
   app_event_loop();
 

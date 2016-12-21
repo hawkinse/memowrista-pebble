@@ -102,8 +102,6 @@ void note_dictation_append_body_callback(DictationSession* session, DictationSes
 
 void note_action_delete_callback(ActionMenu* menu, const ActionMenuItem* action, void* data){
     log_message(APP_LOG_LEVEL_INFO, "Delete note called");
-    //printf("Note window removed from stack");
-    //printf("Note header pointer: %p", noteCurrentHeader);
     send_note_request(MSG_PEBBLE_DELETE_NOTE, noteCurrentHeader->id);
     load_window_show();
     window_stack_remove(noteWindow, false);
@@ -212,12 +210,10 @@ void note_window_load(Window *window){
     Layer* window_layer = window_get_root_layer(window);
 
     noteTimeStatusBar = status_bar_layer_create();
-    //status_bar_layer_set_colors(timeStatusBar, PBL_IF_COLOR_ELSE(GColorRajah, GColorDarkGray), GColorWhite);
     #if PBL_COLOR
     status_bar_layer_set_colors(noteTimeStatusBar, COLOR_PRIMARY, COLOR_TEXT_LIGHT);
     #endif
 
-    //errorGraphicsLayer = layer_create(layer_get_bounds(window_layer));
     layer_add_child(window_layer, status_bar_layer_get_layer(noteTimeStatusBar));
     
     noteMainActionMenuLevel = action_menu_level_create(3);
@@ -240,11 +236,6 @@ void note_window_load(Window *window){
     noteActionMenuConfig->colors.background = COLOR_PRIMARY;
     noteActionMenuConfig->colors.foreground = COLOR_TEXT_LIGHT;
     #endif
-
-    //noteActionBarLayer = action_bar_layer_create();
-    //action_bar_layer_add_to_window(noteActionBarLayer, window);
-    //action_bar_layer_set_click_config_provider(noteActionBarLayer, note_window_click_provider);
-    //window_set_click_config_provider(noteWindow, (ClickConfigProvider)note_window_click_provider);
 
     GRect window_bounds = layer_get_bounds(window_layer);
     noteScrollLayer = scroll_layer_create(GRect(0, STATUS_BAR_LAYER_HEIGHT, window_bounds.size.w, window_bounds.size.h - STATUS_BAR_LAYER_HEIGHT));
@@ -293,7 +284,6 @@ void note_window_unload(Window *window){
     layer_remove_from_parent(scroll_layer_get_layer(noteScrollLayer));
     layer_remove_from_parent(noteButtonHintLayer);
 
-    //action_bar_layer_remove_from_window(noteActionBarLayer);
     status_bar_layer_destroy(noteTimeStatusBar);
     text_layer_destroy(titleTextLayer);
     text_layer_destroy(bodyTextLayer);
@@ -302,7 +292,6 @@ void note_window_unload(Window *window){
     
     action_menu_hierarchy_destroy(noteMainActionMenuLevel, NULL, NULL);
     
-    //action_bar_layer_destroy(noteActionBarLayer);
     free(noteActionMenuConfig);
     noteActionMenuConfig = NULL;
     //noteCurrentHeader = NULL;
